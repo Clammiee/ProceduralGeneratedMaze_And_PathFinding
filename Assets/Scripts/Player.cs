@@ -36,6 +36,7 @@ public class Player : MonoBehaviour
                 {
                     //call function with input hit.collider.gameObject
                    // PathFind(hit.collider.gameObject);
+                   Debug.Log("walkable");
                    PathFind(hit.collider.gameObject);
 
                   if(this.gameObject == hit.collider.gameObject) Debug.Log("done movement");
@@ -52,9 +53,15 @@ public class Player : MonoBehaviour
         Vector3 dir = (go.transform.position - this.transform.position).normalized;
         
         RaycastHit hit;
-        if (Physics.SphereCast(this.transform.position, 2, dir, out hit, 5f))
+        if (Physics.SphereCast(this.transform.position, 5, dir, out hit, 10f))
         {
             if(hit.collider.CompareTag("Walkable"))
+            {
+                this.transform.position = hit.collider.transform.position;
+                PathFind(hit.collider.gameObject);
+                Debug.Log("do we get here");
+            }
+            else if(Physics.SphereCast(this.transform.position, 5, this.transform.right, out hit, 10f))
             {
                 this.transform.position = hit.collider.transform.position;
                 PathFind(hit.collider.gameObject);

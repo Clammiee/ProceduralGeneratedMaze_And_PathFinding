@@ -148,7 +148,7 @@ public class Maze : MonoBehaviour
                         else 
                         { 
                             number = Random.Range(0, 5);
-                            CarvePassagesFrom(currentTransform, number);
+                           // CarvePassagesFrom(currentTransform, number);
 
                         }
                         
