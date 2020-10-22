@@ -354,8 +354,8 @@ public class Maze : MonoBehaviour
             go.GetComponent<Renderer>().material.SetColor("_Color", c);
             go.gameObject.tag = "Walkable";
         }
-        else Recursion(go, -direction);
-       /* if(go.GetComponent<Visited>().FindNeighbor(direction) != null)
+      //  else Recursion(go, -direction);
+       /*if(go.GetComponent<Visited>().FindNeighbor(direction) != null)
                 {
                   GameObject newGo = go.GetComponent<Visited>().FindNeighbor(direction);
 
@@ -371,9 +371,9 @@ public class Maze : MonoBehaviour
                      newGo.GetComponent<Visited>().GetComponent<Renderer>().material.SetColor("_Color", c);
                      newGo.GetComponent<Visited>().gameObject.tag = "Walkable";
                   }
-                  e
+                  else Recursion(newGo, -direction);
                 
-                }*/
+                } */
     }
 }
 
