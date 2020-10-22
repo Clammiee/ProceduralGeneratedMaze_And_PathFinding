@@ -109,3 +109,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   visited: 0
+  walls: 01010101
+  neighborRight: {fileID: 0}
+  neighborLeft: {fileID: 0}
+  neighborUp: {fileID: 0}
+  neighborDown: {fileID: 0}

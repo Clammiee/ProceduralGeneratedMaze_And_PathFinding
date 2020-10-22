@@ -37,7 +37,8 @@ public class Player : MonoBehaviour
                     //call function with input hit.collider.gameObject
                    // PathFind(hit.collider.gameObject);
                    Debug.Log("walkable");
-                   PathFind(hit.collider.gameObject);
+                   Vector3 dir = (hit.collider.gameObject.transform.position - this.transform.position).normalized;
+                   PathFind(hit.collider.gameObject, dir, maze.firstBlock.transform);
 
                   if(this.gameObject == hit.collider.gameObject) Debug.Log("done movement");
                 }
@@ -48,26 +49,32 @@ public class Player : MonoBehaviour
         
     }
 
-    private void PathFind(GameObject go)
+    private void PathFind(GameObject go, Vector3 dir, Transform newTransform)
     {
-        Vector3 dir = (go.transform.position - this.transform.position).normalized;
-        
         RaycastHit hit;
-        if (Physics.SphereCast(this.transform.position, 5, dir, out hit, 10f))
+
+        if (Physics.SphereCast(newTransform.position, 0.5f, dir, out hit, 2f))
         {
             if(hit.collider.CompareTag("Walkable"))
             {
                 this.transform.position = hit.collider.transform.position;
-                PathFind(hit.collider.gameObject);
+                PathFind(hit.collider.gameObject, dir, hit.collider.transform);
                 Debug.Log("do we get here");
             }
-            else if(Physics.SphereCast(this.transform.position, 5, this.transform.right, out hit, 10f))
+            else
             {
-                this.transform.position = hit.collider.transform.position;
-                PathFind(hit.collider.gameObject);
-                Debug.Log("do we get here");
-            }
+                int randomNumber = Random.Range(0, 5);
 
+                Vector3 direction = Vector3.zero;
+
+                if(randomNumber == 0) direction = transform.forward;
+                else if(randomNumber == 1) direction = -transform.forward;
+                else if(randomNumber == 3) direction = transform.right;
+                else if(randomNumber == 4) direction = -transform.right;
+
+                if(direction != dir) PathFind(go, direction, newTransform);
+                else PathFind(go, -direction, newTransform);
+            }
         }
     }
 }
