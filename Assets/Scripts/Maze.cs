@@ -15,6 +15,7 @@ public class Maze : MonoBehaviour
 
     public Color c;
     private float timer = 0.1f;
+    Vector3 direction;
 
 
         
@@ -99,8 +100,6 @@ public class Maze : MonoBehaviour
     {
         bool moreBlocks = false;
       //  int randomNumber = Random.Range(0, 5);
-
-        Vector3 direction = Vector3.zero;
 
         if(randomNumber == 0) direction = currentTransform.forward;
         else if(randomNumber == 1) direction = -currentTransform.forward;
