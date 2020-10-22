@@ -4,18 +4,19 @@ using UnityEngine;
 
 public class Maze : MonoBehaviour
 {
-    [SerializeField] private int arraySizeX;
+    public int arraySizeX;
 
-    [SerializeField] private GameObject[,] array;
+    public GameObject[,] array;
 
     [SerializeField] private GameObject goodBlock;
 
     [SerializeField] private GameObject badBlock;
-    private GameObject firstBlock;
-
+    public GameObject firstBlock;
+    private GameObject lastBlock;
     public Color c;
     private float timer = 0.1f;
     Vector3 direction;
+    Vector3 newDirection;
 
 
         
@@ -26,7 +27,7 @@ public class Maze : MonoBehaviour
         array = new GameObject[arraySizeX, arraySizeX];
 
         generateMaze();
-        CarvePassagesFrom(firstBlock.transform, Random.Range(0, 5));
+      //  CarvePassagesFrom(firstBlock.transform, Random.Range(0, 5));
     }
 
 
@@ -34,7 +35,7 @@ public class Maze : MonoBehaviour
     {
        // CarvePassagesFrom(firstBlock.transform);
 
-     /*  timer = timer - Time.deltaTime;
+       timer = timer - Time.deltaTime;
 
        if(timer <= 0)
        {
@@ -42,9 +43,8 @@ public class Maze : MonoBehaviour
            {
                timer = 0.1f;
            }
-           else Debug.Log("Done Maze creation");
-           
-       } */
+           else Debug.Log("Done Maze creation"); 
+       } 
 
     }
 
@@ -62,6 +62,7 @@ public class Maze : MonoBehaviour
                 else if(i == arraySizeX-1 && j == arraySizeX-1)
                 {
                    array[i, j] = InstantiateBlock(i, j, 0);
+                   lastBlock = array[i, j];
                 }
                 //Good block for 0,0 && another good block for [arraySizeX, arraySizeX]
                /* if((i == 0 && j == 0) || (i == arraySizeX && j == arraySizeX))
@@ -106,35 +107,53 @@ public class Maze : MonoBehaviour
         else if(randomNumber == 3) direction = currentTransform.right;
         else if(randomNumber == 4) direction = -currentTransform.right;
 
+        
+
         RaycastHit hit;
 
-        if (Physics.Raycast(currentTransform.position, direction, out hit, 10f))
+        if (Physics.Raycast(currentTransform.position, direction, out hit, 2f))
         {
-            Debug.Log(hit.collider.gameObject.name);
+        //    Debug.Log(hit.collider.gameObject.name);
 
-            if(hit.collider.gameObject == firstBlock) moreBlocks = false;
-            else moreBlocks = true;
-
+            if(hit.collider.gameObject == lastBlock.transform) moreBlocks = false;
+             else moreBlocks = true;
+            
             if(hit.collider.gameObject.GetComponent<Visited>().visited == false)
             {
                 hit.collider.gameObject.GetComponent<Visited>().visited = true;
-                //destory object replace with red and than
                 hit.collider.gameObject.GetComponent<Renderer>().material.SetColor("_Color", c);
-              //  GameObject old = hit.collider.gameObject;
-              //  GameObject block = Instantiate(badBlock, new Vector3(old.transform.position.x, 0, old.transform.position.z), Quaternion.identity);
-              //  block.GetComponent<Visited>().visited = true;
-
-                
-
-                //Destroy(hit.collider.gameObject);
-                
-                //new x + y
+                hit.collider.gameObject.tag = "Walkable";
                 CarvePassagesFrom(hit.collider.gameObject.transform, Random.Range(0, 5));
             }
             else if(hit.collider.gameObject.GetComponent<Visited>().visited == true)
             {
-                //call again with same transform
-                CarvePassagesFrom(currentTransform, Random.Range(0, 5));
+                if(direction == currentTransform.forward) newDirection = -currentTransform.forward;
+                else if(direction == -currentTransform.forward) newDirection = currentTransform.forward;
+                else if(direction == currentTransform.right) newDirection = -currentTransform.right;
+                else if(direction == -currentTransform.right) newDirection = currentTransform.right;
+
+                if (Physics.Raycast(currentTransform.position, newDirection, out hit, 2f))
+                {
+                    if(hit.collider.gameObject.GetComponent<Visited>().visited == false)
+                    {
+                        hit.collider.gameObject.GetComponent<Visited>().visited = true;
+                        hit.collider.gameObject.GetComponent<Renderer>().material.SetColor("_Color", c);
+                        hit.collider.gameObject.tag = "Walkable";
+                        CarvePassagesFrom(hit.collider.gameObject.transform, Random.Range(0, 5));
+                    }
+                    else 
+                    {
+                        int number = Random.Range(0, 5);
+                        if(number != randomNumber) CarvePassagesFrom(currentTransform, number);
+                        else 
+                        { 
+                            number = Random.Range(0, 5);
+                            CarvePassagesFrom(currentTransform, number);
+
+                        }
+                        
+                    }
+                }
             }
         }
         else 
