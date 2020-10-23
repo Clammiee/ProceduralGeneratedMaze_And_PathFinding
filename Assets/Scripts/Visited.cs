@@ -12,16 +12,23 @@ public class Visited : MonoBehaviour
     public GameObject neighborUp;
     public GameObject neighborDown;
 
+    void Awake()
+    {
+        neighborRight = FindNeighbor(this.transform.right);
+        neighborLeft = FindNeighbor(-this.transform.right);
+        neighborUp = FindNeighbor(this.transform.forward);
+        neighborDown = FindNeighbor(-this.transform.forward);
+    }
+
     void Start()
     {
         //walls[0] = true;
       //  walls[1] = true;
       //  walls[2] = true;
        // walls[3] = true;
-       neighborRight = FindNeighbor(this.transform.right);
-        neighborLeft = FindNeighbor(-this.transform.right);
-        neighborUp = FindNeighbor(this.transform.forward);
-        neighborDown = FindNeighbor(-this.transform.forward);
+
+       
+       
     }
 
 
