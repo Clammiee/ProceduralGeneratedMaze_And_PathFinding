@@ -18,22 +18,23 @@ public class Visited : MonoBehaviour
       //  walls[1] = true;
       //  walls[2] = true;
        // walls[3] = true;
+       neighborRight = FindNeighbor(this.transform.right);
+        neighborLeft = FindNeighbor(-this.transform.right);
+        neighborUp = FindNeighbor(this.transform.forward);
+        neighborDown = FindNeighbor(-this.transform.forward);
     }
 
 
     void Update()
     {
-        neighborRight = FindNeighbor(this.transform.right);
-        neighborLeft = FindNeighbor(-this.transform.right);
-        neighborUp = FindNeighbor(this.transform.up);
-        neighborDown = FindNeighbor(-this.transform.up);
+        
     }
 
     public GameObject FindNeighbor(Vector3 direction)
     {
         GameObject neighbor = null;
         RaycastHit hit;
-        if (Physics.SphereCast(this.transform.position, 0.5f, direction, out hit, 1f))
+        if (Physics.Raycast(this.transform.position, direction, out hit, 1.6f))
         {
             neighbor = hit.collider.gameObject;
         }

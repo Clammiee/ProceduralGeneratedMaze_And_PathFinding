@@ -14,11 +14,16 @@ public class Maze : MonoBehaviour
     public GameObject firstBlock;
     private GameObject lastBlock;
     public Color c;
-    private float timer = 0.1f;
+    private float timer = 0.5f;
     Vector3 direction;
     Vector3 newDirection;
     private List<GameObject> stack = new List<GameObject>();
-     int positionInStack = 0;
+    int positionInStack = 0;
+    public List<GameObject> lineArray = new List<GameObject>();
+    int moreBlocks = 0;
+    int count = 0;
+    bool backout = false;
+
 
 
         
@@ -31,7 +36,9 @@ public class Maze : MonoBehaviour
 
         generateMaze();
       //  CarvePassagesFrom(firstBlock.transform, Random.Range(0, 5))
-       
+       //generate();
+       //CarvePassagesFrom(firstBlock.transform, Random.Range(0, 5));
+      // CarvePassagesFrom(firstBlock.transform, Random.Range(0, 5));
     }
 
 
@@ -43,13 +50,27 @@ public class Maze : MonoBehaviour
 
        if(timer <= 0)
        {
-         //  if(CarvePassagesFrom(firstBlock.transform, Random.Range(0, 5)) == true)
-          // {
-              
-              timer = 0.1f;
-           //    timer = 0.1f;
-                generate();
+           if(count == 0)
+           {
+               CarvePassagesFrom(firstBlock.transform, Random.Range(0, 5));
+               count++;
+           }
+           //CarvePassagesFrom(firstBlock.transform, Random.Range(0, 5));
+         //  if(CarvePassagesFrom(firstBlock.transform, Random.Range(0, 5)) < 3)
+           //{
+              // timer = 0.1f;
           // }
+           //while(CarvePassagesFrom(firstBlock.transform, Random.Range(0, 5)) < 2)
+          // {
+               
+           //}
+          // CarvePassagesFrom(firstBlock.transform, Random.Range(0, 5));
+          // { 
+              
+              //timer = 0.1f;
+           //    timer = 0.1f;
+                
+         // }
           // else Debug.Log("Done Maze creation"); 
        } 
 
@@ -90,7 +111,7 @@ public class Maze : MonoBehaviour
 
         // Only the first position is initialized and set at random
 
-        int startX = Random.Range(0, arraySizeX-1);
+       /* int startX = Random.Range(0, arraySizeX-1);
         int startZ = Random.Range(0, arraySizeX-1);
         stack.Add(array[startX, startZ]);
         positionInStack = 0;
@@ -100,9 +121,9 @@ public class Maze : MonoBehaviour
         array[startX, startZ].GetComponent<Renderer>().material.SetColor("_Color", c);
         array[startX, startZ].gameObject.tag = "Walkable";
 
-      //  Debug.Log(stack.Count);
+      //  Debug.Log(stack.Count);*/
 
-        return array;
+        return array; 
 
         
     }
@@ -121,13 +142,13 @@ public class Maze : MonoBehaviour
         return block;
     }
 
-    private bool CarvePassagesFrom(Transform currentTransform, int randomNumber)
+    private int CarvePassagesFrom(Transform currentTransform, int randomNumber)
     {
         // FIRST TRY HERE ----------------------------------------------------------------------------------------------------------
-        /*bool moreBlocks = false;
+        
       //  int randomNumber = Random.Range(0, 5);
 
-        if(randomNumber == 0) direction = currentTransform.forward;
+        /*if(randomNumber == 0) direction = currentTransform.forward;
         else if(randomNumber == 1) direction = -currentTransform.forward;
         else if(randomNumber == 3) direction = currentTransform.right;
         else if(randomNumber == 4) direction = -currentTransform.right;
@@ -189,30 +210,231 @@ public class Maze : MonoBehaviour
 
         // FIRST TRY END HERE -----------------------------------------------------------------------------------------------------
 
-        bool moreBlocks = false;
+        //int moreBlocks = false;
 
-        if(currentTransform == lastBlock.transform) moreBlocks = false;
-        else moreBlocks = true;
+        if(currentTransform == firstBlock.transform) moreBlocks++;
         
-        if(randomNumber == 0) direction = currentTransform.forward;
+     /*   if(randomNumber == 0) direction = currentTransform.forward;
         else if(randomNumber == 1) direction = -currentTransform.forward;
         else if(randomNumber == 3) direction = currentTransform.right;
-        else if(randomNumber == 4) direction = -currentTransform.right;
+        else if(randomNumber == 4) direction = -currentTransform.right; */
 
-        if(currentTransform.gameObject.GetComponent<Visited>().FindNeighbor(direction) != null && currentTransform.gameObject.GetComponent<Visited>().FindNeighbor(direction).GetComponent<Visited>().visited == false)
+
+
+
+        if(currentTransform.gameObject.GetComponent<Visited>().visited == false)
         {
-            currentTransform.gameObject.GetComponent<Visited>().FindNeighbor(direction).GetComponent<Visited>().visited = true;
-            currentTransform.gameObject.GetComponent<Visited>().FindNeighbor(direction).GetComponent<Renderer>().material.SetColor("_Color", c);
-            currentTransform.gameObject.GetComponent<Visited>().FindNeighbor(direction).tag = "Walkable";
-            CarvePassagesFrom(currentTransform.gameObject.GetComponent<Visited>().FindNeighbor(direction).transform, Random.Range(0, 5));
+            currentTransform.gameObject.GetComponent<Visited>().visited = true;
+            currentTransform.gameObject.GetComponent<Renderer>().material.SetColor("_Color", c);
+            currentTransform.gameObject.tag = "Walkable";
+            lineArray.Add(currentTransform.gameObject);
+            CarvePassagesFrom(currentTransform.gameObject.transform , 0); //, Random.Range(0, 5));
         }
-        else 
+        else //if(currentTransform.gameObject.GetComponent<Visited>().FindNeighbor(direction) != null && currentTransform.gameObject.GetComponent<Visited>().FindNeighbor(direction).GetComponent<Visited>().visited == true)
         {
-            CarvePassagesFrom(currentTransform, Random.Range(0, 5));
+           // for (int i = lineArray.Count-1; i > -1; i--)
+         //  {
+               int i = lineArray.Count-1;
+               int random = Random.Range(0, 4);
+
+               Debug.Log(random + ": random");
+               int done = false;
+               
+               while(i > -1 && backout == false && done == false)
+               {
+                   
+                   Debug.Log("i: " + i);
+
+                   if(RandomNeighbor(random, lineArray[i], currentTransform.gameObject) == false)
+                   {
+                       i--;
+                   }
+                   else done = true;
+                    //i = lineArray.Count-1; //RandomNeighbor(Random.Range(0, 5), lineArray[i], currentTransform.gameObject);
+                    
+               }
+               //if(i > -1) backout = false;
+               if(i <= -1)
+               {
+                    backout = true;
+               }
+
+               if(backout == true)
+               {
+                   int j = 0;
+                   bool finalBack = false;
+
+                   Debug.Log("finalBack" + finalBack);
+
+                   while(j < lineArray.Count && finalBack == false)
+                   {
+                       Debug.Log(j + " j");
+
+                       if(lineArray[j].GetComponent<Visited>().neighborRight != null && lineArray[j].GetComponent<Visited>().neighborRight.GetComponent<Visited>().visited == false)
+                        {
+                            backout = false;
+                            finalBack = true;
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborRight.transform, 0);
+                        }
+                        else if(lineArray[j].GetComponent<Visited>().neighborLeft != null && lineArray[j].GetComponent<Visited>().neighborLeft.GetComponent<Visited>().visited == false)
+                        {
+                            backout = false;
+                            finalBack = true;
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborLeft.transform, 0);
+                        }
+                        else if(lineArray[j].GetComponent<Visited>().neighborUp != null && lineArray[j].GetComponent<Visited>().neighborUp.GetComponent<Visited>().visited == false)
+                        {
+                            backout = false;
+                            finalBack = true;
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborUp.transform, 0);
+                        }
+                        else if(lineArray[j].GetComponent<Visited>().neighborDown != null && lineArray[j].GetComponent<Visited>().neighborDown.GetComponent<Visited>().visited == false)
+                        {
+                            backout = false;
+                            finalBack = true;
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborDown.transform, 0);
+                        }
+                        else j++;
+
+                   }
+               }
+
+               //if(backout == true) CarvePassagesFrom(currentTransform.gameObject.transform , 0);
+             //  RandomNeighbor(Random.Range(0, 5), lineArray[lineArray.Count-1], currentTransform.gameObject);
+
+               /* if(lineArray[i].GetComponent<Visited>().neighborRight != null && lineArray[i].GetComponent<Visited>().neighborRight.GetComponent<Visited>().visited == false)
+                {
+                   // lineArray.Remove(lineArray[i]);
+                    CarvePassagesFrom(lineArray[i].GetComponent<Visited>().neighborRight.transform, 0);
+                }
+                else if(lineArray[i].GetComponent<Visited>().neighborLeft != null && lineArray[i].GetComponent<Visited>().neighborLeft.GetComponent<Visited>().visited == false)
+                {
+                   // lineArray.Remove(lineArray[i]);
+                    CarvePassagesFrom(lineArray[i].GetComponent<Visited>().neighborLeft.transform, 0);
+                }
+                else if(lineArray[i].GetComponent<Visited>().neighborUp != null && lineArray[i].GetComponent<Visited>().neighborUp.GetComponent<Visited>().visited == false)
+                {
+                   // lineArray.Remove(lineArray[i]);
+                    CarvePassagesFrom(lineArray[i].GetComponent<Visited>().neighborUp.transform, 0);
+                }
+                else if(lineArray[i].GetComponent<Visited>().neighborDown != null && lineArray[i].GetComponent<Visited>().neighborDown.GetComponent<Visited>().visited == false)
+                {
+                   // lineArray.Remove(lineArray[i]);
+                    CarvePassagesFrom(lineArray[i].GetComponent<Visited>().neighborDown.transform, 0);
+                }*/
+           //}
         }
 
         return moreBlocks;
 
+    }
+
+    private bool RandomNeighbor(int random, GameObject go, GameObject current)
+    {
+        if(random == 0)
+        {
+            if(go.GetComponent<Visited>().neighborRight != null && go.GetComponent<Visited>().neighborRight.GetComponent<Visited>().visited == false)
+            {
+                // lineArray.Remove(lineArray[i]);
+                
+                CarvePassagesFrom(go.GetComponent<Visited>().neighborRight.transform, 0);
+                return true;
+            }
+            else return false;
+           /* else if(go.GetComponent<Visited>().neighborDown != null && go.GetComponent<Visited>().neighborDown.GetComponent<Visited>().visited == false)
+            {
+                // lineArray.Remove(lineArray[i]);
+                CarvePassagesFrom(go.GetComponent<Visited>().neighborDown.transform, 0);
+            }
+            else if(go.GetComponent<Visited>().neighborUp != null && go.GetComponent<Visited>().neighborUp.GetComponent<Visited>().visited == false)
+            {
+                // lineArray.Remove(lineArray[i]);
+                CarvePassagesFrom(go.GetComponent<Visited>().neighborUp.transform, 0);
+            }
+            else if(go.GetComponent<Visited>().neighborLeft != null && go.GetComponent<Visited>().neighborLeft.GetComponent<Visited>().visited == false)
+            {
+                // lineArray.Remove(lineArray[i]);
+                CarvePassagesFrom(go.GetComponent<Visited>().neighborLeft.transform, 0);
+            } */
+        }
+        else if(random == 1)
+        {
+            if(go.GetComponent<Visited>().neighborDown != null && go.GetComponent<Visited>().neighborDown.GetComponent<Visited>().visited == false)
+            {
+                // lineArray.Remove(lineArray[i]);
+                CarvePassagesFrom(go.GetComponent<Visited>().neighborDown.transform, 0);
+                return true;
+            }
+            else return false;
+           /* else if(go.GetComponent<Visited>().neighborRight != null && go.GetComponent<Visited>().neighborRight.GetComponent<Visited>().visited == false)
+            {
+                // lineArray.Remove(lineArray[i]);
+                CarvePassagesFrom(go.GetComponent<Visited>().neighborRight.transform, 0);
+            }
+            else if(go.GetComponent<Visited>().neighborUp != null && go.GetComponent<Visited>().neighborUp.GetComponent<Visited>().visited == false)
+            {
+                // lineArray.Remove(lineArray[i]);
+                CarvePassagesFrom(go.GetComponent<Visited>().neighborUp.transform, 0);
+            }
+            else if(go.GetComponent<Visited>().neighborLeft != null && go.GetComponent<Visited>().neighborLeft.GetComponent<Visited>().visited == false)
+            {
+                // lineArray.Remove(lineArray[i]);
+                CarvePassagesFrom(go.GetComponent<Visited>().neighborLeft.transform, 0);
+            } */
+        }
+        else if(random == 2)
+        {
+            if(go.GetComponent<Visited>().neighborUp != null && go.GetComponent<Visited>().neighborUp.GetComponent<Visited>().visited == false)
+            {
+                
+                // lineArray.Remove(lineArray[i]);
+                CarvePassagesFrom(go.GetComponent<Visited>().neighborUp.transform, 0);
+                return true;
+            }
+            else return false;
+          /*  else if(go.GetComponent<Visited>().neighborRight != null && go.GetComponent<Visited>().neighborRight.GetComponent<Visited>().visited == false)
+            {
+                // lineArray.Remove(lineArray[i]);
+                CarvePassagesFrom(go.GetComponent<Visited>().neighborRight.transform, 0);
+            }
+            else if(go.GetComponent<Visited>().neighborDown != null && go.GetComponent<Visited>().neighborDown.GetComponent<Visited>().visited == false)
+            {
+                // lineArray.Remove(lineArray[i]);
+                CarvePassagesFrom(go.GetComponent<Visited>().neighborDown.transform, 0);
+            }
+            else if(go.GetComponent<Visited>().neighborLeft != null && go.GetComponent<Visited>().neighborLeft.GetComponent<Visited>().visited == false)
+            {
+                // lineArray.Remove(lineArray[i]);
+                CarvePassagesFrom(go.GetComponent<Visited>().neighborLeft.transform, 0);
+            }*/
+        }
+        else if(random == 3)
+        {
+            if(go.GetComponent<Visited>().neighborLeft != null && go.GetComponent<Visited>().neighborLeft.GetComponent<Visited>().visited == false)
+            {
+                
+                // lineArray.Remove(lineArray[i]);
+                CarvePassagesFrom(go.GetComponent<Visited>().neighborLeft.transform, 0);
+                return true;
+            }
+            else return false;
+           /*else if(go.GetComponent<Visited>().neighborRight != null && go.GetComponent<Visited>().neighborRight.GetComponent<Visited>().visited == false)
+            {
+                // lineArray.Remove(lineArray[i]);
+                CarvePassagesFrom(go.GetComponent<Visited>().neighborRight.transform, 0);
+            }
+            else if(go.GetComponent<Visited>().neighborDown != null && go.GetComponent<Visited>().neighborDown.GetComponent<Visited>().visited == false)
+            {
+                // lineArray.Remove(lineArray[i]);
+                CarvePassagesFrom(go.GetComponent<Visited>().neighborDown.transform, 0);
+            }
+            else if(go.GetComponent<Visited>().neighborUp != null && go.GetComponent<Visited>().neighborUp.GetComponent<Visited>().visited == false)
+            {
+                // lineArray.Remove(lineArray[i]);
+                CarvePassagesFrom(go.GetComponent<Visited>().neighborUp.transform, 0);
+            }*/
+        }
+        else return false;
     }
 
     private int[] CheckNeighbors(GameObject go)
@@ -339,20 +561,45 @@ public class Maze : MonoBehaviour
                     array[x, z].GetComponent<Renderer>().material.SetColor("_Color", c);
                     array[x, z].gameObject.tag = "Walkable";
                 }*/
-                Recursion(array[x, z], direction);
+                //Recursion(array[x, z]);
              }
             else positionInStack--;
         }
     }
 
-    private void Recursion(GameObject go, Vector3 direction)
+    private void Recursion(GameObject go)
     {
         if(go.GetComponent<Visited>().visited == false)
         {
             go.GetComponent<Visited>().visited = true;
-                    //  array[x, z].GetComponent<Visited>().walls[3-wall] = false;
+            lineArray.Add(go);
+            //  array[x, z].GetComponent<Visited>().walls[3-wall] = false;
             go.GetComponent<Renderer>().material.SetColor("_Color", c);
             go.gameObject.tag = "Walkable";
+
+            Recursion(go);
+        }
+        else if(go.GetComponent<Visited>().visited == true)
+        {
+            for (int i = lineArray.Count-1; i > -1; i--)
+            {
+                if(lineArray[i].GetComponent<Visited>().neighborRight != null && lineArray[i].GetComponent<Visited>().neighborRight.GetComponent<Visited>().visited == false)
+                {
+                    Recursion(lineArray[i].GetComponent<Visited>().neighborRight);
+                }
+                else if(lineArray[i].GetComponent<Visited>().neighborLeft != null && lineArray[i].GetComponent<Visited>().neighborLeft.GetComponent<Visited>().visited == false)
+                {
+                    Recursion(lineArray[i].GetComponent<Visited>().neighborLeft);
+                }
+                else if(lineArray[i].GetComponent<Visited>().neighborUp != null && lineArray[i].GetComponent<Visited>().neighborUp.GetComponent<Visited>().visited == false)
+                {
+                    Recursion(lineArray[i].GetComponent<Visited>().neighborUp);
+                }
+                else if(lineArray[i].GetComponent<Visited>().neighborDown != null && lineArray[i].GetComponent<Visited>().neighborDown.GetComponent<Visited>().visited == false)
+                {
+                    Recursion(lineArray[i].GetComponent<Visited>().neighborDown);
+                }
+            }
         }
       //  else Recursion(go, -direction);
        /*if(go.GetComponent<Visited>().FindNeighbor(direction) != null)
