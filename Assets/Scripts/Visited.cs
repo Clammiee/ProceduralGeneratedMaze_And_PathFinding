@@ -14,10 +14,7 @@ public class Visited : MonoBehaviour
 
     void Awake()
     {
-        neighborRight = FindNeighbor(this.transform.right);
-        neighborLeft = FindNeighbor(-this.transform.right);
-        neighborUp = FindNeighbor(this.transform.forward);
-        neighborDown = FindNeighbor(-this.transform.forward);
+        
     }
 
     void Start()
@@ -27,7 +24,10 @@ public class Visited : MonoBehaviour
       //  walls[2] = true;
        // walls[3] = true;
 
-       
+       neighborRight = FindNeighbor(this.transform.right);
+        neighborLeft = FindNeighbor(-this.transform.right);
+        neighborUp = FindNeighbor(this.transform.forward);
+        neighborDown = FindNeighbor(-this.transform.forward);
        
     }
 

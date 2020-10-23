@@ -14,6 +14,7 @@ public class Maze : MonoBehaviour
     public GameObject firstBlock;
     private GameObject lastBlock;
     public Color c;
+    public Color cRed;
     private float timer = 0.5f;
     Vector3 direction;
     Vector3 newDirection;
@@ -48,7 +49,7 @@ public class Maze : MonoBehaviour
        //generate();
        //CarvePassagesFrom(firstBlock.transform, Random.Range(0, 5));
       // CarvePassagesFrom(firstBlock.transform, Random.Range(0, 5));
-      if(array[arraySizeX-1, arraySizeX-1] != null) CarvePassagesFrom(array[1, 1].transform, Random.Range(0, 5), false);
+      
     }
 
 
@@ -65,7 +66,7 @@ public class Maze : MonoBehaviour
        {
            if(count == 0)
            {
-               
+               if(array[arraySizeX-1, arraySizeX-1] != null) CarvePassagesFrom(array[0, 0].transform, Random.Range(0, 5), false);
                count++;
            }
            //CarvePassagesFrom(firstBlock.transform, Random.Range(0, 5));
@@ -225,7 +226,13 @@ public class Maze : MonoBehaviour
 
         //int moreBlocks = false;
 
-        if(currentTransform == firstBlock.transform) moreBlocks++;
+        if(currentTransform == array[arraySizeX-1, arraySizeX-1] || currentTransform == array[0, 0] ) moreBlocks++;
+
+        if(moreBlocks > 1)
+        {
+            Debug.Log("Went to start");
+            return 0;
+        } 
         
      /*   if(randomNumber == 0) direction = currentTransform.forward;
         else if(randomNumber == 1) direction = -currentTransform.forward;
@@ -242,6 +249,37 @@ public class Maze : MonoBehaviour
             currentTransform.gameObject.GetComponent<Renderer>().material.SetColor("_Color", c);
             currentTransform.gameObject.tag = "Walkable";
             CarvePassagesFrom(currentTransform, 1, true);
+
+            /*int random = Random.Range(0, 4);
+
+            if(random == 0 && currentTransform.gameObject.GetComponent<Visited>().neighborUp != null)
+            {
+                currentTransform.gameObject.GetComponent<Visited>().neighborUp.GetComponent<Visited>().visited = true;
+                currentTransform.gameObject.GetComponent<Visited>().neighborUp.GetComponent<Renderer>().material.SetColor("_Color", cRed);
+                currentTransform.gameObject.GetComponent<Visited>().neighborUp.tag = "Untagged";
+                CarvePassagesFrom(currentTransform.gameObject.GetComponent<Visited>().neighborUp.transform, 1, true);
+            }
+            else if(random == 1 && currentTransform.gameObject.GetComponent<Visited>().neighborRight != null)
+            {
+                currentTransform.gameObject.GetComponent<Visited>().neighborRight.GetComponent<Visited>().visited = true;
+                currentTransform.gameObject.GetComponent<Visited>().neighborRight.GetComponent<Renderer>().material.SetColor("_Color", cRed);
+                currentTransform.gameObject.GetComponent<Visited>().neighborRight.tag = "Untagged";
+                CarvePassagesFrom(currentTransform.gameObject.GetComponent<Visited>().neighborRight.transform, 1, true);
+            }
+            else if(random == 2 && currentTransform.gameObject.GetComponent<Visited>().neighborDown != null)
+            {
+                currentTransform.gameObject.GetComponent<Visited>().neighborDown.GetComponent<Visited>().visited = true;
+                currentTransform.gameObject.GetComponent<Visited>().neighborDown.GetComponent<Renderer>().material.SetColor("_Color", cRed);
+                currentTransform.gameObject.GetComponent<Visited>().neighborDown.tag = "Untagged";
+                CarvePassagesFrom(currentTransform.gameObject.GetComponent<Visited>().neighborDown.transform, 1, true);
+            }
+            else if(random == 3 && currentTransform.gameObject.GetComponent<Visited>().neighborLeft != null)
+            {
+                currentTransform.gameObject.GetComponent<Visited>().neighborLeft.GetComponent<Visited>().visited = true;
+                currentTransform.gameObject.GetComponent<Visited>().neighborLeft.GetComponent<Renderer>().material.SetColor("_Color", cRed);
+                currentTransform.gameObject.GetComponent<Visited>().neighborLeft.tag = "Untagged";
+                CarvePassagesFrom(currentTransform.gameObject.GetComponent<Visited>().neighborLeft.transform, 1, true);
+            } */
         }
         else //if(currentTransform.gameObject.GetComponent<Visited>().FindNeighbor(direction) != null && currentTransform.gameObject.GetComponent<Visited>().FindNeighbor(direction).GetComponent<Visited>().visited == true)
         {
@@ -357,33 +395,38 @@ public class Maze : MonoBehaviour
             bool backout = false;
                 done = false;
 
-               Debug.Log(random + ": random");
+              // Debug.Log(random + ": random");
                
                
                while(i > -1 && backout == false && done == false)
                {
-                   if(RandomNeighbor(random, lineArray[i], currentTransform.gameObject) == false)
+                 if(RandomNeighbor(random, lineArray[i], currentTransform.gameObject) == false)
                    {
+                      // notVisited();
                        i--;
                    }
                    else done = true;
                     //i = lineArray.Count-1; //RandomNeighbor(Random.Range(0, 5), lineArray[i], currentTransform.gameObject);
                     Debug.Log("i: " + i);
                }
-               //if(i > -1) backout = false;
-               if(i <= -1 && backout == false)
-                {
-                    backout = true;
+               if(i <= -1)
+               {
+                   if(notVisited() == false) return;
+               }
+             //  if(i <= -1 && backout == false && notVisited() == false)
+              //  {
+                    //backout = true;
                    // done = true; 
                   //  i = (lineArray.Count-1);
-                    notVisited(); //, Random.Range(0, 5));
-                    Debug.Log("why dont we see this");
+                //  RandomNeighbor(random, lineArray[i], currentTransform.gameObject) == false
+                   // notVisited(); //, Random.Range(0, 5));
+                  //  Debug.Log("why dont we see this");
                     
-                } 
+               // } 
               
     }
 
-    private void notVisited()
+    private bool notVisited()
     {
        /* int i = lineArray.Count-1;
                int random = Random.Range(0, 4);
@@ -419,18 +462,23 @@ public class Maze : MonoBehaviour
 
                        GameObject neighbor = null;
 
-                        if(lineArray[j].GetComponent<Visited>().neighborRight != null) neighbor = lineArray[j].GetComponent<Visited>().neighborRight;
-                        else if(lineArray[j].GetComponent<Visited>().neighborLeft!= null) neighbor = lineArray[j].GetComponent<Visited>().neighborLeft;
-                        else if(lineArray[j].GetComponent<Visited>().neighborUp != null) neighbor = lineArray[j].GetComponent<Visited>().neighborUp;
-                        else if(lineArray[j].GetComponent<Visited>().neighborDown!= null) neighbor = lineArray[j].GetComponent<Visited>().neighborDown;
-                        else Debug.Log("faill");
+                        
+                        
+                        int randomNumberUgg = Random.Range(0, 4);
 
-                       if(lineArray[j].GetComponent<Visited>().neighborRight != null && neighbor.gameObject.GetComponent<Visited>().visited == false)
+                        Debug.Log(randomNumberUgg + ": randomNumberUgg");
+
+                        if( (RandomNess(randomNumberUgg, j)) == false) j++;
+                        else return true;
+                        
+                      /* if(lineArray[j].GetComponent<Visited>().neighborRight != null && neighbor.gameObject.GetComponent<Visited>().visited == false)
                         {
                             Debug.Log("do we even get here?");
                             finalBack = true;
+                            
                             CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborRight.transform, 0, false);
                             //
+                            return true;
                           //  j = lineArray.Count;
                         }
                         else if(lineArray[j].GetComponent<Visited>().neighborLeft != null && neighbor.GetComponent<Visited>().visited == false)
@@ -438,8 +486,10 @@ public class Maze : MonoBehaviour
                           //  backout = false;
                             //final = true;
                             finalBack = true;
+                            
                             CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborLeft.transform, 0, false);
                             //finalBack = true;
+                            return true;
                            // j = lineArray.Count;
                         }
                         else if(lineArray[j].GetComponent<Visited>().neighborUp != null && neighbor.GetComponent<Visited>().visited == false)
@@ -447,22 +497,232 @@ public class Maze : MonoBehaviour
                            // backout = false;
                            // final = true;
                            finalBack = true;
+                           
                             CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborUp.transform, 0, false);
                             //finalBack = true;
                            // j = lineArray.Count;
+                           return true;
                         }
                         else if(lineArray[j].GetComponent<Visited>().neighborDown != null && neighbor.GetComponent<Visited>().visited == false)
                         {
                           //  backout = false;
                            // final = true;
                            finalBack = true;
+                           
                             CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborDown.transform, 0, false);
                             //finalBack = true;
+                            return true;
                             //j = lineArray.Count;
-                        }
-                        else j++;
+                        }*/
+                      //  else j++;
 
                    }
+                   return false;
+        }
+
+        private bool RandomNess(int number, int j)
+        {
+            
+
+            if(number == 0)
+            {
+              /*  if(lineArray[j].GetComponent<Visited>().neighborRight != null) neighbor = ;
+            else if(lineArray[j].GetComponent<Visited>().neighborLeft!= null) neighbor = lineArray[j].GetComponent<Visited>().neighborLeft;
+            else if(lineArray[j].GetComponent<Visited>().neighborUp != null) neighbor = lineArray[j].GetComponent<Visited>().neighborUp;
+            else if(lineArray[j].GetComponent<Visited>().neighborDown!= null) neighbor = lineArray[j].GetComponent<Visited>().neighborDown;
+            else return false; */
+
+                if(lineArray[j].GetComponent<Visited>().neighborRight != null && lineArray[j].GetComponent<Visited>().neighborRight.gameObject.GetComponent<Visited>().visited == false)
+                        {
+                            Debug.Log("do we even get here?1");
+                           // finalBack = true;
+                            
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborRight.transform, 0, false);
+                            //
+                            return true;
+                          //  j = lineArray.Count;
+                        }
+                        else if(lineArray[j].GetComponent<Visited>().neighborLeft != null && lineArray[j].GetComponent<Visited>().neighborLeft.GetComponent<Visited>().visited == false)
+                        {
+                          //  backout = false;
+                            //final = true;
+                           // finalBack = true;
+                           Debug.Log("do we even get here?2");
+                            
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborLeft.transform, 0, false);
+                            //finalBack = true;
+                            return true;
+                           // j = lineArray.Count;
+                        }
+                        else if(lineArray[j].GetComponent<Visited>().neighborUp != null && lineArray[j].GetComponent<Visited>().neighborUp.GetComponent<Visited>().visited == false)
+                        {
+                           // backout = false;
+                           // final = true;
+                          // finalBack = true;
+                          Debug.Log("do we even get here?3");
+                           
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborUp.transform, 0, false);
+                            //finalBack = true;
+                           // j = lineArray.Count;
+                           return true;
+                        }
+                        else if(lineArray[j].GetComponent<Visited>().neighborDown != null && lineArray[j].GetComponent<Visited>().neighborDown.GetComponent<Visited>().visited == false)
+                        {
+                          //  backout = false;
+                           // final = true;
+                          // finalBack = true;
+                          Debug.Log("do we even get here?4");
+                           
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborDown.transform, 0, false);
+                            //finalBack = true;
+                            return true;
+                            //j = lineArray.Count;
+                        }
+            }
+            else if(random == 1)
+            {
+                
+                        if(lineArray[j].GetComponent<Visited>().neighborLeft != null && lineArray[j].GetComponent<Visited>().neighborLeft.GetComponent<Visited>().visited == false)
+                        {
+                          //  backout = false;
+                            //final = true;
+                           // finalBack = true;
+                           Debug.Log("do we even get here?5");
+                            
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborLeft.transform, 0, false);
+                            //finalBack = true;
+                            return true;
+                           // j = lineArray.Count;
+                        }
+                        else if(lineArray[j].GetComponent<Visited>().neighborUp != null && lineArray[j].GetComponent<Visited>().neighborUp.GetComponent<Visited>().visited == false)
+                        {
+                           // backout = false;
+                           // final = true;
+                          // finalBack = true;
+                           Debug.Log("do we even get here?6");
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborUp.transform, 0, false);
+                            //finalBack = true;
+                           // j = lineArray.Count;
+                           return true;
+                        }
+                        else if(lineArray[j].GetComponent<Visited>().neighborDown != null && lineArray[j].GetComponent<Visited>().neighborDown.GetComponent<Visited>().visited == false)
+                        {
+                          //  backout = false;
+                           // final = true;
+                        //   finalBack = true;
+                           Debug.Log("do we even get here?7");
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborDown.transform, 0, false);
+                            //finalBack = true;
+                            return true;
+                            //j = lineArray.Count;
+                        }
+                        else if(lineArray[j].GetComponent<Visited>().neighborRight != null && lineArray[j].GetComponent<Visited>().neighborRight.gameObject.GetComponent<Visited>().visited == false)
+                        {
+                            Debug.Log("do we even get here?8");
+                          //  finalBack = true;
+                            
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborRight.transform, 0, false);
+                            //
+                            return true;
+                          //  j = lineArray.Count;
+                        }
+            }
+            else if(random == 2)
+            {
+                if(lineArray[j].GetComponent<Visited>().neighborUp != null && lineArray[j].GetComponent<Visited>().neighborUp.GetComponent<Visited>().visited == false)
+                        {
+                           // backout = false;
+                           // final = true;
+                         //  finalBack = true;
+                           Debug.Log("do we even get here?9");
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborUp.transform, 0, false);
+                            //finalBack = true;
+                           // j = lineArray.Count;
+                           return true;
+                        }
+                        else if(lineArray[j].GetComponent<Visited>().neighborDown != null && lineArray[j].GetComponent<Visited>().neighborDown.GetComponent<Visited>().visited == false)
+                        {
+                          //  backout = false;
+                           // final = true;
+                         //  finalBack = true;
+                           Debug.Log("do we even get here?11");
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborDown.transform, 0, false);
+                            //finalBack = true;
+                            return true;
+                            //j = lineArray.Count;
+                        }
+                        else if(lineArray[j].GetComponent<Visited>().neighborRight != null && lineArray[j].GetComponent<Visited>().neighborRight.gameObject.GetComponent<Visited>().visited == false)
+                        {
+                            Debug.Log("do we even get here?12");
+                           // finalBack = true;
+                            
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborRight.transform, 0, false);
+                            //
+                            return true;
+                          //  j = lineArray.Count;
+                        }
+                        else if(lineArray[j].GetComponent<Visited>().neighborLeft != null && lineArray[j].GetComponent<Visited>().neighborLeft.GetComponent<Visited>().visited == false)
+                        {
+                          //  backout = false;
+                            //final = true;
+                          // finalBack = true;
+                            Debug.Log("do we even get here?13");
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborLeft.transform, 0, false);
+                            //finalBack = true;
+                            return true;
+                           // j = lineArray.Count;
+                        }
+            }
+            else if(random == 3)
+            {
+                
+                        if(lineArray[j].GetComponent<Visited>().neighborDown != null && lineArray[j].GetComponent<Visited>().neighborDown.GetComponent<Visited>().visited == false)
+                        {
+                          //  backout = false;
+                           // final = true;
+                          // finalBack = true;
+                           Debug.Log("do we even get here?14");
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborDown.transform, 0, false);
+                            //finalBack = true;
+                            return true;
+                            //j = lineArray.Count;
+                        }
+                        else if(lineArray[j].GetComponent<Visited>().neighborRight != null && lineArray[j].GetComponent<Visited>().neighborRight.gameObject.GetComponent<Visited>().visited == false)
+                        {
+                            Debug.Log("do we even get here?15");
+                          //  finalBack = true;
+                            
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborRight.transform, 0, false);
+                            //
+                            return true;
+                          //  j = lineArray.Count;
+                        }
+                        else if(lineArray[j].GetComponent<Visited>().neighborLeft != null && lineArray[j].GetComponent<Visited>().neighborLeft.GetComponent<Visited>().visited == false)
+                        {
+                          //  backout = false;
+                            //final = true;
+                           // finalBack = true;
+                            Debug.Log("do we even get here?16");
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborLeft.transform, 0, false);
+                            //finalBack = true;
+                            return true;
+                           // j = lineArray.Count;
+                        }
+                        else if(lineArray[j].GetComponent<Visited>().neighborUp != null && lineArray[j].GetComponent<Visited>().neighborUp.GetComponent<Visited>().visited == false)
+                        {
+                           // backout = false;
+                           // final = true;
+                           //finalBack = true;
+                           Debug.Log("do we even get here?17");
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborUp.transform, 0, false);
+                            //finalBack = true;
+                           // j = lineArray.Count;
+                           return true;
+                        }
+            }
+
+                     return false;   
+
         }
 
 

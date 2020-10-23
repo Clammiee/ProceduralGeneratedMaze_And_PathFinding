@@ -436,7 +436,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76f0ec6e29da8554a82c354ec57b179b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  arraySizeX: 10
+  arraySizeX: 5
   goodBlock: {fileID: 3774217294321845233, guid: 7533e892337e3f5499cb50279f9a9bdd, type: 3}
   badBlock: {fileID: 3415542421308113370, guid: d4d847102cf5c2a408f10eefe1a0ddc1, type: 3}
   firstBlock: {fileID: 0}
