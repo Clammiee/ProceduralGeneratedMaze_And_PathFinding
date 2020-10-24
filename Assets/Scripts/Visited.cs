@@ -12,6 +12,13 @@ public class Visited : MonoBehaviour
     public GameObject neighborUp;
     public GameObject neighborDown;
 
+    public GameObject newNeighborRight;
+    public GameObject newNeighborLeft;
+    public GameObject newNeighborUp;
+    public GameObject newNeighborDown;
+
+
+
     void Awake()
     {
         
@@ -34,7 +41,13 @@ public class Visited : MonoBehaviour
 
     void Update()
     {
-        
+        if(this.gameObject.transform.parent.GetComponent<Maze>().count > 0)
+        {
+            newNeighborRight = FindNewNeighbor(this.transform.right);
+            newNeighborLeft = FindNewNeighbor(-this.transform.right);
+            newNeighborUp = FindNewNeighbor(this.transform.forward);
+            newNeighborDown = FindNewNeighbor(-this.transform.forward);
+        }
     }
 
     public GameObject FindNeighbor(Vector3 direction)
@@ -46,6 +59,17 @@ public class Visited : MonoBehaviour
             neighbor = hit.collider.gameObject;
         }
 
+        return neighbor;
+    }
+
+    public GameObject FindNewNeighbor(Vector3 direction)
+    {
+        GameObject neighbor = null;
+        RaycastHit hit;
+        if (Physics.Raycast(this.transform.position, direction, out hit, 1f))
+        {
+            neighbor = hit.collider.gameObject;
+        }
         return neighbor;
     }
 

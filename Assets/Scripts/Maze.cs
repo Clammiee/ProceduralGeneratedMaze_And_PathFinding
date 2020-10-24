@@ -23,13 +23,14 @@ public class Maze : MonoBehaviour
     int positionInStack = 0;
     public List<GameObject> lineArray = new List<GameObject>();
     int moreBlocks = 0;
-    int count = 0;
+    public int count = 0;
    // bool backout = false;
     bool done = false;
     //bool finalBack = false;
     int random = 0;
     [SerializeField] private GameObject passageBlock;
     int spawnCount = 0;
+    private int count2 = 0;
 
 
         
@@ -75,6 +76,15 @@ public class Maze : MonoBehaviour
                count++;
            }
 
+            if(count2 == 0 && count > 0)
+            {
+                foreach (Transform child in this.transform)
+                {
+                    child.GetComponent<Collider>().enabled = true;
+                    child.GetComponent<Visited>().enabled = true;
+                }
+                count2++;
+            }
            //if count2 == 0
 
             //if count > 0
