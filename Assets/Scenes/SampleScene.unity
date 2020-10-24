@@ -400,8 +400,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: 0.69260937, y: 0.015141156, z: -0.0145441955, w: 0.7210073}
-  m_LocalPosition: {x: 4.767984, y: 10.310118, z: 3.1943285}
+  m_LocalRotation: {x: 0.7119756, y: 0.0021044072, z: -0.0021323496, w: 0.70219785}
+  m_LocalPosition: {x: 9.094253, y: 17.381622, z: 6.8135505}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -436,7 +436,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76f0ec6e29da8554a82c354ec57b179b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  arraySizeX: 5
+  arraySizeX: 8
+  arrayX: []
   goodBlock: {fileID: 3774217294321845233, guid: 7533e892337e3f5499cb50279f9a9bdd, type: 3}
   badBlock: {fileID: 3415542421308113370, guid: d4d847102cf5c2a408f10eefe1a0ddc1, type: 3}
   firstBlock: {fileID: 0}
@@ -516,6 +517,10 @@ PrefabInstance:
     - target: {fileID: 3415542421308113370, guid: d4d847102cf5c2a408f10eefe1a0ddc1, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3415542421308113370, guid: d4d847102cf5c2a408f10eefe1a0ddc1, type: 3}
+      propertyPath: m_TagString
+      value: Walkable
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d4d847102cf5c2a408f10eefe1a0ddc1, type: 3}
