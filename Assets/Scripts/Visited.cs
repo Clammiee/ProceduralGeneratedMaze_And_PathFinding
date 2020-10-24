@@ -41,7 +41,7 @@ public class Visited : MonoBehaviour
     {
         GameObject neighbor = null;
         RaycastHit hit;
-        if (Physics.Raycast(this.transform.position, direction, out hit, 1.6f))
+        if (Physics.Raycast(this.transform.position, direction, out hit, 3f))
         {
             neighbor = hit.collider.gameObject;
         }
