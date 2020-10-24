@@ -7,6 +7,7 @@ public class Maze : MonoBehaviour
     public int arraySizeX;
 
     public List<List<GameObject>> array = new List<List<GameObject>>();
+    public List<GameObject> arrayX;
 
     [SerializeField] private GameObject goodBlock;
 
@@ -36,6 +37,7 @@ public class Maze : MonoBehaviour
 
     void Awake()
     {
+      //  arraySizeX = arraySizeX;
        // array = new GameObject[arraySizeX, arraySizeX];
       //  stack = new GameObject[arraySizeX * arraySizeX -1];
         generateMaze();
@@ -45,6 +47,7 @@ public class Maze : MonoBehaviour
     {
         
     Debug.Log("arraySize " + array.Count);
+    Debug.Log("arrayXSize " + arrayX.Count);
         
       //  CarvePassagesFrom(firstBlock.transform, Random.Range(0, 5))
        //generate();
@@ -68,7 +71,7 @@ public class Maze : MonoBehaviour
        {
            if(count == 0)
            {
-               CarvePassagesFrom(array[0, 0].transform, Random.Range(0, 5), false);
+               CarvePassagesFrom(firstBlock.transform, Random.Range(0, 5), false);
                count++;
            }
 
@@ -100,10 +103,14 @@ public class Maze : MonoBehaviour
 
     }
 
-    private GameObject[,] generateMaze()
+    private void generateMaze()
     {
         for (int i = 0; i < arraySizeX; i++)
         {
+            arrayX = new List<GameObject>();
+
+            array.Add(arrayX);
+
             for (int j = 0; j < arraySizeX; j++)
             {
                 Vector3 pos = Vector3.zero;
@@ -114,20 +121,22 @@ public class Maze : MonoBehaviour
             }
             else if(i % 2 != 0 && j % 2 == 0)
             {
-                pos = new Vector3(i+1, 0, j);
+                pos = new Vector3(i*2, 0, j);
             } 
             else if(i % 2 == 0 && j % 2 != 0)
             {
-                pos = new Vector3(i, 0, j+1);
+                pos = new Vector3(i, 0, j*2);
             } 
             else if(i % 2 != 0 && j % 2 != 0)
             {
-                pos = new Vector3(i+1, 0, j+1);
+                pos = new Vector3(i*2, 0, j*2);
             } 
 
                 if((i == 0 && j == 0))
                 {
-                    array.Add(InstantiateBlock(i, j, 0, pos));
+                    GameObject newBlock = InstantiateBlock(i, j, 1, pos);
+                    arrayX.Add(newBlock);
+                    firstBlock = newBlock;
                 } 
               //  else if(i == (arraySizeX*2-1)-1 && j == (arraySizeX*2-1)-1)
                // {
@@ -135,8 +144,8 @@ public class Maze : MonoBehaviour
                   // lastBlock = array[i, j];
                // }
                 //else if(i == 0 || j == 0 || i == arraySizeX || j == arraySizeX) array[i, j] = InstantiateBlock(i, j, 1);
-                else if(i < (arraySizeX*2-1)-1 && j < (arraySizeX*2-1)-1) array.Add(InstantiateBlock(i, j, 1, pos));
-
+               // else if(i < arraySizeX && j < arraySizeX) arrayX.Add(InstantiateBlock(i, j, 1, pos));
+                else arrayX.Add(InstantiateBlock(i, j, 1, pos));
 
                // array[i, j] = InstantiateBlock(i, j, number);
 
@@ -163,7 +172,7 @@ public class Maze : MonoBehaviour
 
       //  Debug.Log(stack.Count);*/
 
-        return array; 
+       // return;
 
         
     }
@@ -258,7 +267,7 @@ public class Maze : MonoBehaviour
 
         //int moreBlocks = false;
 
-        if(currentTransform == array[0, 0] ) moreBlocks++;
+        if(currentTransform == firstBlock ) moreBlocks++;
 
         if(moreBlocks > 3)
         {
@@ -567,7 +576,7 @@ public class Maze : MonoBehaviour
                         {
                             Debug.Log("do we even get here?1");
                            // finalBack = true;
-                           Vector3 pos = new Vector3((lineArray[j].GetComponent<Visited>().neighborRight.transform.position.x - lineArray[j].transform.position.x)/2, 0, (lineArray[j].GetComponent<Visited>().neighborRight.transform.position.z - lineArray[j].transform.position.z)/2);
+                           Vector3 pos = new Vector3((lineArray[j].GetComponent<Visited>().neighborRight.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (lineArray[j].GetComponent<Visited>().neighborRight.transform.position.z - lineArray[j].transform.position.z)/2);
                             Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
 
                             CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborRight.transform, 0, false);
@@ -931,7 +940,7 @@ public class Maze : MonoBehaviour
         //return true;
     }
 
-    private int[] CheckNeighbors(GameObject go)
+  /*  private int[] CheckNeighbors(GameObject go)
     {
         Vector3 currentPosition = go.transform.position;
 
@@ -967,7 +976,7 @@ public class Maze : MonoBehaviour
 
 
         // Check wall 2 
-        if (z - 1 >= 0) // Are we still in the size of the maze
+       /* if (z - 1 >= 0) // Are we still in the size of the maze
         {
             if (array[x, z - 1].GetComponent<Visited>().visited == false) result.Add(1); // Add wall 2
         }
@@ -979,9 +988,9 @@ public class Maze : MonoBehaviour
         }
 
         return result.ToArray();
-    }
+    } */
 
-    private void generate()
+  /*  private void generate()
     {
         while(positionInStack >= 0)
         {
@@ -1056,7 +1065,7 @@ public class Maze : MonoBehaviour
                     array[x, z].gameObject.tag = "Walkable";
                 }*/
                 //Recursion(array[x, z]);
-             }
+           /*  }
             else positionInStack--;
         }
     }
@@ -1094,9 +1103,9 @@ public class Maze : MonoBehaviour
                     Recursion(lineArray[i].GetComponent<Visited>().neighborDown);
                 }
             }
-        }
+        } */
       //  else Recursion(go, -direction);
-       /*if(go.GetComponent<Visited>().FindNeighbor(direction) != null)
+      /* if(go.GetComponent<Visited>().FindNeighbor(direction) != null)
                 {
                   GameObject newGo = go.GetComponent<Visited>().FindNeighbor(direction);
 
@@ -1115,6 +1124,6 @@ public class Maze : MonoBehaviour
                   else Recursion(newGo, -direction);
                 
                 } */
-    }
+  //  }
 }
 
