@@ -17,6 +17,8 @@ public class Visited : MonoBehaviour
     public GameObject newNeighborUp;
     public GameObject newNeighborDown;
 
+    public List<GameObject> neighbors = new List<GameObject>();
+
 
 
     void Awake()
@@ -47,6 +49,11 @@ public class Visited : MonoBehaviour
             newNeighborLeft = FindNewNeighbor(-this.transform.right);
             newNeighborUp = FindNewNeighbor(this.transform.forward);
             newNeighborDown = FindNewNeighbor(-this.transform.forward);
+
+            neighbors.Add(newNeighborRight);
+            neighbors.Add(newNeighborLeft);
+            neighbors.Add(newNeighborUp);
+            neighbors.Add(newNeighborDown);
         }
     }
 
