@@ -7,6 +7,7 @@ public class Player : MonoBehaviour
     public Maze maze;
     private int count = 0;
     public List<Transform> distanceFromGoal = new List<Transform>();
+    public List<Transform> distanceFromCurrent = new List<Transform>();
     public List<Transform> allBlocks = new List<Transform>();
     public GameObject goTo;
 
@@ -43,7 +44,7 @@ public class Player : MonoBehaviour
 
                    Vector3 dir = (hit.collider.gameObject.transform.position - this.transform.position).normalized;
                    
-                   FindPath(hit.collider.gameObject, maze.firstBlock); //FindPath(hit.collider.gameObject, maze.firstBlock);
+                   StartCoroutine(FindPath(hit.collider.gameObject, maze.firstBlock, 0.5f)); //FindPath(hit.collider.gameObject, maze.firstBlock);
 
 
                    if(this.gameObject == hit.collider.gameObject) Debug.Log("done movement");
@@ -55,37 +56,63 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void FindPath(GameObject go, GameObject current) //
+    //Needs to be a coroutine
+    private IEnumerator FindPath(GameObject go, GameObject current, float waitTime) //
     {
-        Transform[] allChildren = maze.gameObject.GetComponentsInChildren<Transform>();
+       /* if(Vector3.Distance(current.GetComponent<Visited>().newNeighborDown.transform.position, go.transform.position) < Vector3.Distance(current.GetComponent<Visited>().newNeighborUp.transform.position, go.transform.position) && Vector3.Distance(current.GetComponent<Visited>().newNeighborDown.transform.position, go.transform.position) < Vector3.Distance(current.GetComponent<Visited>().newNeighborLeft.transform.position, go.transform.position) && Vector3.Distance(current.GetComponent<Visited>().newNeighborDown.transform.position, go.transform.position) < Vector3.Distance(current.GetComponent<Visited>().newNeighborRight.transform.position, go.transform.position))
+        {
+            this.transform.position = current.GetComponent<Visited>().newNeighborDown.transform.position;
+            FindPath(go, current.GetComponent<Visited>().newNeighborDown);
+        }*/
+        yield return new WaitForSeconds(waitTime);
+
+        if(current.GetComponent<Visited>().newNeighborUp != null && (current.GetComponent<Visited>().newNeighborDown == null || Vector3.Distance(go.transform.position, current.GetComponent<Visited>().newNeighborUp.transform.position) < Vector3.Distance(go.transform.position, current.GetComponent<Visited>().newNeighborDown.transform.position)) && (current.GetComponent<Visited>().newNeighborLeft == null || Vector3.Distance(go.transform.position, current.GetComponent<Visited>().newNeighborUp.transform.position) < Vector3.Distance(go.transform.position, current.GetComponent<Visited>().newNeighborLeft.transform.position)) && (current.GetComponent<Visited>().newNeighborRight == null || Vector3.Distance(go.transform.position, current.GetComponent<Visited>().newNeighborUp.transform.position) < Vector3.Distance(go.transform.position, current.GetComponent<Visited>().newNeighborRight.transform.position)))
+        {
+            this.transform.position = current.GetComponent<Visited>().newNeighborUp.transform.position;
+            StartCoroutine(FindPath(go, current.GetComponent<Visited>().newNeighborUp, 0.5f));
+        }
+       /* Transform[] allChildren = maze.gameObject.GetComponentsInChildren<Transform>();
 
         foreach(Transform block in allChildren)
         {
-            //allBlocks.add(block);
+            allBlocks.Add(block);
 
-            foreach (Transform otherBlock in allChildren)
+            foreach (Transform otherBlock in allBlocks)
             {
-                if(Vector3.Distance(otherBlock.position, go.transform.position) < Vector3.Distance(block.position, go.transform.position))
+                if(Vector3.Distance(block.position, go.transform.position) < Vector3.Distance(otherBlock.position, go.transform.position))
                 {
-                    distanceFromGoal.Add(otherBlock);
+                    distanceFromGoal.Add(block);
                    // allBlocks.Remove()
-                } //else distanceFromGoal.Remove(otherBlock);
+                } //else distanceFromGoal.Add(otherBlock);
             }
         }
+
+        for (int i = 0; i < distanceFromGoal.Count; i++)
+        {
+                if(Vector3.Distance(distanceFromGoal[i].position, current.transform.position) < Vector3.Distance(distanceFromGoal[j].position, current.transform.position))
+                {
+                    distanceFromCurrent.Add(distanceFromGoal[i]);
+                } //else distanceFromCurrent.Add(distanceFromGoal[i+1]);
+        }
+       // foreach(Transform distanceFromGoalTransform in distanceFromGoal)
+       // {
+            
+        //}
+        //take distancefrom goal and order them according to distance from current
 
         Transform remove = null;
-        foreach (Transform distanceBlock in distanceFromGoal)
-        {
-            if(distanceBlock == current.GetComponent<Visited>().newNeighborRight.transform || distanceBlock == current.GetComponent<Visited>().newNeighborLeft.transform || distanceBlock == current.GetComponent<Visited>().newNeighborUp.transform || distanceBlock == current.GetComponent<Visited>().newNeighborDown.transform)
+        //foreach (Transform distanceBlock in distanceFromGoal)
+        //{
+            //instead if using distanceFromGoal[0] use distanceFromCurrent[0] 
+            if((current.GetComponent<Visited>().newNeighborRight != null && distanceFromCurrent[0] == current.GetComponent<Visited>().newNeighborRight.transform) || (current.GetComponent<Visited>().newNeighborLeft != null && distanceFromCurrent[0] == current.GetComponent<Visited>().newNeighborLeft.transform) || (current.GetComponent<Visited>().newNeighborUp != null && distanceFromCurrent[0] == current.GetComponent<Visited>().newNeighborUp.transform) || (current.GetComponent<Visited>().newNeighborDown !=null && distanceFromCurrent[0] == current.GetComponent<Visited>().newNeighborDown.transform))
             {
-                this.gameObject.transform.position = distanceBlock.position;
-                remove = distanceBlock;
+                this.gameObject.transform.position = distanceFromCurrent[0].position;
+                remove = distanceFromCurrent[0];
             }
-        }
-        if(remove != null) distanceFromGoal.Remove(remove);
+       // }
+        if(remove != null) distanceFromCurrent.Remove(remove);*/
 
-     //   if(go.transform.position != this.gameObject.position) FindPath(go, this.gameObject.position);
-      //  else return;
+       // if(go.transform.position == this.gameObject.transform.position) return; 
 
     }
 
