@@ -14,10 +14,16 @@ public class Player : MonoBehaviour
     Queue<GameObject> frontier = new Queue<GameObject>();
     Dictionary <GameObject, Vector3> cameFrom = new Dictionary<GameObject, Vector3>();
     private int count2 = 0;
+    private int count3 = 0;
     GameObject newOBJ = null;
-    List<Vector3> first = new List<Vector3>();
-    List<Vector3> second = new List<Vector3>();
-    List<Vector3> direction = new List<Vector3>();
+    GameObject newDir = null;
+    List<GameObject> first = new List<GameObject>();
+    List<GameObject> second = new List<GameObject>();
+    List<GameObject> direction = new List<GameObject>();
+    List<float> distance = new List<float>();
+    int n = 0;
+    int m = 0;
+    Queue<GameObject> frontierTemp = new Queue<GameObject>();
 
     void Start()
     {
@@ -35,8 +41,9 @@ public class Player : MonoBehaviour
                 count2 = 0;
                 count++;
             }
+        }
 
-            if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0))
         {
 
             RaycastHit hit;
@@ -54,18 +61,36 @@ public class Player : MonoBehaviour
                    //Vector3 dir = (hit.collider.gameObject.transform.position - this.transform.position).normalized;
                    
                    
+
                    if(count2 == 0)
                     {
                         frontier.Enqueue(maze.firstBlock);
                         cameFrom.Add(maze.firstBlock, Vector3.zero);
                         //could be in other function
 
-                       FindPath(hit.collider.gameObject, maze.firstBlock);
+                       
 
+                        FindPath(hit.collider.gameObject, maze.firstBlock);
                         
 
                        count2++;
                     } //FindPath(hit.collider.gameObject, maze.firstBlock);
+                        
+                        if(direction.Count > 0)
+                        {
+                            if(count2 > 0 && count3 == 0)
+                            {
+                                n = (direction.Count);
+                                count3++;
+                            } 
+                                if(n > 0)
+                                {
+                                    Debug.Log("direction.Count: " + direction.Count);
+                                    Debug.Log("direction: " + direction[n--].transform.position);
+                                    StartCoroutine(Hop(0.5f, direction[n--].transform.position));
+                                    
+                                } 
+                        }
 
                    if(this.gameObject.transform.position != hit.collider.gameObject.transform.position)
                    {
@@ -78,17 +103,14 @@ public class Player : MonoBehaviour
                      //  foreach (Vector3 dir in direction)
                       // {
                             
-                           //
-                           Debug.Log(direction.Count);
+                               //if(this.gameObject.transform.position == hit.collider.gameObject.transform.position) break;
+                         // }
 
-                            foreach (Vector3 dir in direction)
-                            {
-                                Debug.Log(dir);
-                                StartCoroutine(Hop(0.5f, dir));
-                                if(this.gameObject.transform.position == hit.collider.gameObject.transform.position) break;
-                            }
-                           
-                      // } 
+                          //  foreach (GameObject dir in direction)
+                           // {
+                        
+                        
+                            
                    } 
                    else if(this.gameObject.transform.position == hit.collider.gameObject.transform.position) Debug.Log("done movement");
 
@@ -96,7 +118,7 @@ public class Player : MonoBehaviour
                 else Debug.Log("Please select a valid point");
             }
         }
-        }
+        
     }
 
     private IEnumerator Hop(float wait, Vector3 goTo)
@@ -104,6 +126,100 @@ public class Player : MonoBehaviour
         yield return new WaitForSeconds(wait);
 
         this.gameObject.transform.position = goTo;
+      //  for (int i = 0; i < dir.Count; i++)
+        //{
+          //  n--;
+       // }
+    
+    }
+
+    private void Repeat(GameObject go, GameObject current)
+    {
+       frontierTemp.Enqueue(go);
+
+
+        while(frontierTemp.Count > 0)
+        {
+            
+            newDir = frontierTemp.Dequeue();
+            
+            if(newDir != null)
+            {
+
+             direction.Add(newDir);
+        
+            if(newDir == current) break;
+
+                
+                   // for (int k = 0; k < direction.Count; k++)
+                  //  {
+                        //loop thru all neighrbos to get each of their distance from 000
+                        
+                            
+                            distance.Clear();
+
+                          //  Debug.Log("dir nieghbors count: " + dir.GetComponent<Visited>().neighbors.Count);
+
+                          //  List<GameObject> neighbors = ;
+                          for (int k = 0; k < newDir.GetComponent<Visited>().neighbors.Count; k++)
+                          {
+                                float d = Vector3.Distance(current.transform.position, newDir.GetComponent<Visited>().neighbors[k].transform.position);
+                                //if(d == 0) return;
+                                distance.Add(d);
+                          }
+
+                            //foreach (GameObject neighbor in )
+                         //   {
+                                //if(neighbor != null)
+                               // {
+                                    
+                               // } 
+                          //  }
+                                //GET neighbor with smallest distance from 000
+                                Vector3 nextNeighbor = Vector3.zero;
+                                float min = 0;
+                                int iteration = 0;
+
+                                for (int l = 0; l < distance.Count; l++)
+                                {
+                                    if(l == 0)
+                                    {
+                                        min = distance[l];
+                                        iteration = l;
+                                    }
+
+                                    if(distance[l] < min)
+                                    {
+                                        min = distance[l];
+                                        iteration = l;
+                                    } 
+                                }
+                                
+                                for (int j = 0; j < newDir.gameObject.GetComponent<Visited>().neighbors.Count; j++)
+                                {
+                                // if(dir.gameObject.GetComponent<Visited>().neighbors[j] != null) Debug.Log(dir.gameObject.GetComponent<Visited>().neighbors[j].transform.position);
+
+                                    if(iteration == j) nextNeighbor = newDir.gameObject.GetComponent<Visited>().neighbors[j].transform.position;
+                                    
+                                         
+                                       // else if(nextNeighbor == current.transform.position) return;
+                                }
+
+                                for (int i = 0; i < second.Count; i++)
+                                {
+                                    if(second[i].transform.position == nextNeighbor && nextNeighbor != current.transform.position)
+                                        {
+                                           // direction.Add(second[i]);
+                                          //  m++;
+                                           // Repeat(go, current, direction[m]);
+                                           frontierTemp.Enqueue(second[i]);
+                                          
+                                        } 
+                                   
+                                }
+                            }
+        }
+        return;
     }
 
     //Needs to be a coroutine
@@ -133,8 +249,8 @@ public class Player : MonoBehaviour
                 //   direction.Add(first[first.Count-2]);
                 /*  direction.Add(second[first.Count-2]);
 
-               // }
-                
+               // } /
+                 
                 
                     for (int j = 0; j < direction.Count; j++)
                         {
@@ -144,25 +260,17 @@ public class Player : MonoBehaviour
                             }
                         }*/
 
-                for (int i = 0; i < second.Count; i++)
-                {
-                    if(i == second.Count-1) direction.Add(first[i]);
+               // for (int i = 0; i < second.Count; i++)
+               // {
+                  //  if(second[i] == go) direction.Add(go);
+               // }
+                //direction.Add(go);
+              //  m = 0;
+               //
+              // frontierTemp.Enqueue(go);
+                Repeat(go, current);
 
-
-                    //direction for loop
-                   for (int j = 0; j < direction[0].GetComponent<Visited>().neighbors.Count; j++)
-                   {
-                       //GET neighbor with smallest distance from 000
-
-                       if(second[i] == direction[0].GetComponent<Visited>().neighbors[j].transform.position)
-                       {
-                           direction.Add(second[i]);
-                       }
-                   }
-                    
-                }
-
-                return;
+                break;
             } 
 
             foreach(GameObject next in newOBJ.GetComponent<Visited>().neighbors)
@@ -173,9 +281,9 @@ public class Player : MonoBehaviour
                     cameFrom.Add(next, newOBJ.transform.position);
                     //frontier.Remove(newOBJ);
                    // Debug.Log(frontier.Peek().transform.position);
-                   first.Add(next.transform.position);
+                   first.Add(next);
                    Debug.Log("first: " + next.transform.position);
-                   second.Add(newOBJ.transform.position);
+                   second.Add(newOBJ);
                    Debug.Log("second: " + newOBJ.transform.position);
                 }
             }
@@ -248,6 +356,7 @@ public class Player : MonoBehaviour
         if(remove != null) distanceFromCurrent.Remove(remove);*/
 
        // if(go.transform.position == this.gameObject.transform.position) return; 
+        return;
 
     }
 

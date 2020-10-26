@@ -30,7 +30,7 @@ public class Maze : MonoBehaviour
     int random = 0;
     [SerializeField] private GameObject passageBlock;
     int spawnCount = 0;
-    private int count2 = 0;
+    public int count2 = 0;
 
 
         

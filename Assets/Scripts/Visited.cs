@@ -18,6 +18,7 @@ public class Visited : MonoBehaviour
     public GameObject newNeighborDown;
 
     public List<GameObject> neighbors = new List<GameObject>();
+    private int count = 0;
 
 
 
@@ -43,18 +44,25 @@ public class Visited : MonoBehaviour
 
     void Update()
     {
-        if(this.gameObject.transform.parent.GetComponent<Maze>().count > 0)
+        if(this.gameObject.transform.parent.GetComponent<Maze>().count > 0 && this.gameObject.transform.parent.GetComponent<Maze>().count2 > 0)
         {
             newNeighborRight = FindNewNeighbor(this.transform.right);
             newNeighborLeft = FindNewNeighbor(-this.transform.right);
             newNeighborUp = FindNewNeighbor(this.transform.forward);
             newNeighborDown = FindNewNeighbor(-this.transform.forward);
 
-            neighbors.Add(newNeighborRight);
-            neighbors.Add(newNeighborLeft);
-            neighbors.Add(newNeighborUp);
-            neighbors.Add(newNeighborDown);
+            if(count == 0)
+            {
+                if(newNeighborRight != null) neighbors.Add(newNeighborRight);
+                if(newNeighborLeft != null) neighbors.Add(newNeighborLeft);
+                if(newNeighborUp != null) neighbors.Add(newNeighborUp);
+                if(newNeighborDown != null) neighbors.Add(newNeighborDown);
+
+                count++;
+            }
         }
+
+
     }
 
     public GameObject FindNeighbor(Vector3 direction)
