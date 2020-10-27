@@ -5,6 +5,7 @@ using UnityEngine;
 public class Visited : MonoBehaviour
 {
     public bool visited = false;
+    public bool playerVisited = false;
     public List<bool> walls = new List<bool>(); 
 
     public GameObject neighborRight;
