@@ -30,10 +30,7 @@ public class Visited : MonoBehaviour
 
     void Start()
     {
-        //walls[0] = true;
-      //  walls[1] = true;
-      //  walls[2] = true;
-       // walls[3] = true;
+
 
        neighborRight = FindNeighbor(this.transform.right);
         neighborLeft = FindNeighbor(-this.transform.right);
@@ -89,19 +86,5 @@ public class Visited : MonoBehaviour
         return neighbor;
     }
 
-    public int x, z;
-
-    public GameObject MazePosition(int posX, int posZ)
-    {
-        x = posX;
-       // y = posY;
-        z = posZ;
-        
-        return this.gameObject;
-    }
 }
 
-//public class MazePosition
-//{
-    
-//}
