@@ -12,7 +12,7 @@ public class Player : MonoBehaviour
     public GameObject goTo;
 
     Queue<GameObject> frontier = new Queue<GameObject>();
-    Dictionary <GameObject, Vector3> cameFrom = new Dictionary<GameObject, Vector3>();
+    Dictionary <GameObject, GameObject> cameFrom = new Dictionary<GameObject, GameObject>();
     private int count2 = 0;
     private int count3 = 0;
     GameObject newOBJ = null;
@@ -24,6 +24,10 @@ public class Player : MonoBehaviour
     int n = 0;
     int m = 0;
     Queue<GameObject> frontierTemp = new Queue<GameObject>();
+    Vector3 upSide = new Vector3(0, 0, 1);
+    Vector3 rightSide = new Vector3(1, 0, 0);
+    GameObject finalee = null;
+    bool done = false;
 
     void Start()
     {
@@ -65,12 +69,12 @@ public class Player : MonoBehaviour
                    if(count2 == 0)
                     {
                         frontier.Enqueue(maze.firstBlock);
-                        cameFrom.Add(maze.firstBlock, Vector3.zero);
+                        cameFrom.Add(maze.firstBlock, maze.firstBlock);
                         //could be in other function
 
                        
 
-                        FindPath(hit.collider.gameObject, maze.firstBlock);
+                      if(hit.collider.gameObject.GetComponent<Visited>().count > 0)  FindPath(hit.collider.gameObject, maze.firstBlock);
                         
 
                        count2++;
@@ -99,7 +103,8 @@ public class Player : MonoBehaviour
                                 } else return;
                         } */
                         Debug.Log("direction.Count: " + direction.Count);
-                        StartCoroutine(Hop(0.5f));
+
+                       if(done == true) StartCoroutine(Hop(0.5f));
 
                    if(this.gameObject.transform.position != hit.collider.gameObject.transform.position)
                    {
@@ -135,7 +140,7 @@ public class Player : MonoBehaviour
         
         
       //  for (int i = direction.Count-1; i > -1; i--)
-      for (int i = 0; i < direction.Count; i++)
+      for (int i = direction.Count-1; i > -1; i--)
         {
             yield return new WaitForSeconds(wait);
 
@@ -156,12 +161,111 @@ public class Player : MonoBehaviour
 
     private void Repeat(GameObject go, GameObject current, GameObject final, GameObject secondFinal)
     {
-        
-        for (int i = 0; i < first.Count; i++)
-        {
-            
+        int iteration = 0;
+        GameObject secondFinalee = null;
+        bool gotFinal = false;
+        bool gotSecondFinal = false;
 
+        Debug.Log("do we get here test");
+
+        if(secondFinal == null)
+        {
+            for (int i = 0; i < first.Count; i++)
+              {
+                    if(first[i] == direction[direction.Count-1])
+                    {
+                        direction.Add(first[i]);
+                        final = first[i];
+                        iteration = i;
+                        int nieghborCount = 0;
+
+                        if(final != null)
+                        {
+                            foreach (GameObject finalNeighbor in final.GetComponent<Visited>().neighbors)
+                            {
+                                if(second[iteration] != finalNeighbor) nieghborCount++;
+                            }
+                            if(nieghborCount == final.GetComponent<Visited>().neighbors.Count) secondFinal = second[iteration];
+                            else 
+                            {
+                                direction.Add(second[iteration]);
+                                if(final != null && (direction[direction.Count-1].transform.position != upSide && direction[direction.Count-1].transform.position != rightSide)) Repeat(go, current, final, secondFinal);
+                                else
+                                {   
+                                    done = true;
+                                    return;
+                                } 
+                            }
+                        }
+                    } 
+              }
         }
+        else if(secondFinal != null)
+        {
+            for (int i = 0; i < first.Count; i++)
+            {
+                if(secondFinal == first[i])
+                {
+                    if(second[i].GetComponent<Visited>() != null)
+                        {
+                            if(second[i].GetComponent<Visited>().neighbors != null && second[i].GetComponent<Visited>().neighbors.Count > 0 && second[i].GetComponent<Visited>().enabled == true)
+                            {
+                                foreach (GameObject neighbor in second[i].GetComponent<Visited>().neighbors)
+                                {
+                                    if(neighbor == final)
+                                    {
+                                        direction.Add(neighbor);    
+                                        final = second[i];
+                                        gotFinal = true;
+                                    }
+                                }
+                            }
+                        }
+                }
+            }
+
+                        
+
+                    
+            
+                if(final != null && final.GetComponent<Visited>() != null)
+                {
+                    int nieghborCount = 0;
+
+                    if(final.GetComponent<Visited>().neighbors.Count > 0)
+                    {
+                        foreach (GameObject finalNeighbor in final.GetComponent<Visited>().neighbors)
+                        {
+                            for (int j = 0; j < first.Count; j++)
+                            {
+                                if(second[j] != finalNeighbor)
+                                {
+                                    secondFinalee = second[j];
+                                    nieghborCount++;
+                                } 
+                            }
+                        }
+                        if(nieghborCount == final.GetComponent<Visited>().neighbors.Count && secondFinalee != null)
+                        {
+                            secondFinal = secondFinalee;
+                            gotSecondFinal= true;
+                        } 
+                    }
+                }
+
+                if((direction[direction.Count-1].transform.position != upSide && direction[direction.Count-1].transform.position != rightSide) && gotSecondFinal == true && gotFinal == true) Repeat(go, current, final, secondFinal);
+                else
+                {
+                    done = true;
+                    return;
+                } 
+        }
+        
+        
+        
+
+        
+        
       /*  GameObject prev = null;
         float distanceBetween =  Vector3.Distance(current.transform.position, go.transform.position);
 
@@ -320,6 +424,8 @@ public class Player : MonoBehaviour
 
               GameObject final = null;
               GameObject secondFinal = null;
+              //GameObject secondPreFinal = null;
+              int iteration = 0;
 
               for (int i = 0; i < first.Count; i++)
               {
@@ -327,19 +433,30 @@ public class Player : MonoBehaviour
                     {
                         direction.Add(first[i]);
                         final = first[i];
+                        iteration = i;
                     } 
+              }
 
-                    int nieghborCount = 0;
+                  int nieghborCount = 0;
 
-                    foreach (GameObject finalNeighbor in final.GetComponent<Visited>().neighbors)
+                    if(final != null)
                     {
-                        if(second[i] != finalNeighbor) nieghborCount++;
+                        foreach (GameObject finalNeighbor in final.GetComponent<Visited>().neighbors)
+                        {
+                            if(second[iteration] != finalNeighbor) nieghborCount++;
+                        }
+                        if(nieghborCount == final.GetComponent<Visited>().neighbors.Count) secondFinal = second[iteration];
+                        else 
+                        {
+                            direction.Add(second[iteration]);
+                        }
                     }
 
-                    if(nieghborCount == final.GetComponent<Visited>().neighbors.Count) secondFinal = second[i];
-              }
+                    
+                    
               
-                Repeat(go, current, final, secondFinal);
+                if(secondFinal  != null) Debug.Log("secondFinal : " + secondFinal.transform.position);
+                if((final != null && secondFinal != null) || (direction.Count == 2)) Repeat(go, current, final, secondFinal);
 
                 break;
             } 
@@ -349,12 +466,12 @@ public class Player : MonoBehaviour
                 if(next != null && cameFrom.ContainsKey(next) == false)
                 {
                     frontier.Enqueue(next);
-                    cameFrom.Add(next, newOBJ.transform.position);
+                    cameFrom.Add(next, newOBJ);
                     //frontier.Remove(newOBJ);
                    // Debug.Log(frontier.Peek().transform.position);
                    first.Add(next);
                    Debug.Log("first: " + next.transform.position);
-                   second.Add(newOBJ);
+                   if(newOBJ != null) second.Add(newOBJ);
                    Debug.Log("second: " + newOBJ.transform.position);
                 }
             }

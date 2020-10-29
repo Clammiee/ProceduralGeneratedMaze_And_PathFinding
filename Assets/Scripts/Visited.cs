@@ -19,7 +19,7 @@ public class Visited : MonoBehaviour
     public GameObject newNeighborDown;
 
     public List<GameObject> neighbors = new List<GameObject>();
-    private int count = 0;
+    public int count = 0;
 
 
 
