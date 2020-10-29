@@ -154,8 +154,14 @@ public class Player : MonoBehaviour
     
     }
 
-    private void Repeat(GameObject go, GameObject current)
+    private void Repeat(GameObject go, GameObject current, GameObject final, GameObject secondFinal)
     {
+        
+        for (int i = 0; i < first.Count; i++)
+        {
+            
+
+        }
       /*  GameObject prev = null;
         float distanceBetween =  Vector3.Distance(current.transform.position, go.transform.position);
 
@@ -311,7 +317,29 @@ public class Player : MonoBehaviour
               //  m = 0;
                //
               // frontierTemp.Enqueue(go);
-                Repeat(go, current);
+
+              GameObject final = null;
+              GameObject secondFinal = null;
+
+              for (int i = 0; i < first.Count; i++)
+              {
+                    if(first[i] == go)
+                    {
+                        direction.Add(first[i]);
+                        final = first[i];
+                    } 
+
+                    int nieghborCount = 0;
+
+                    foreach (GameObject finalNeighbor in final.GetComponent<Visited>().neighbors)
+                    {
+                        if(second[i] != finalNeighbor) nieghborCount++;
+                    }
+
+                    if(nieghborCount == final.GetComponent<Visited>().neighbors.Count) secondFinal = second[i];
+              }
+              
+                Repeat(go, current, final, secondFinal);
 
                 break;
             } 
