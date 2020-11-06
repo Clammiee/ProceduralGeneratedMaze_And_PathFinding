@@ -232,6 +232,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maze: {fileID: 1362434140}
+  distanceFromGoal: []
+  distanceFromCurrent: []
+  allBlocks: []
+  goTo: {fileID: 0}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -438,13 +442,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   arraySizeX: 8
   arrayX: []
-  goodBlock: {fileID: 3774217294321845233, guid: 7533e892337e3f5499cb50279f9a9bdd, type: 3}
-  badBlock: {fileID: 3415542421308113370, guid: d4d847102cf5c2a408f10eefe1a0ddc1, type: 3}
+  initBlock: {fileID: 3774217294321845233, guid: 7533e892337e3f5499cb50279f9a9bdd, type: 3}
   firstBlock: {fileID: 0}
   c: {r: 0, g: 1, b: 0.19104314, a: 1}
-  cRed: {r: 1, g: 0, b: 0, a: 1}
   lineArray: []
+  count: 0
   passageBlock: {fileID: 5941447245266896725, guid: 7a90ea27c668b8142925c540530b6915, type: 3}
+  count2: 0
 --- !u!4 &1362434141
 Transform:
   m_ObjectHideFlags: 0

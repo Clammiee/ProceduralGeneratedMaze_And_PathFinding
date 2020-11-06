@@ -5,27 +5,24 @@ using UnityEngine;
 public class Maze : MonoBehaviour
 {
     public int arraySizeX;
-    public List<List<GameObject>> array = new List<List<GameObject>>();
-    public List<GameObject> arrayX;
-    [SerializeField] private GameObject goodBlock;
-    [SerializeField] private GameObject badBlock;
-    public GameObject firstBlock;
+    [HideInInspector] public List<List<GameObject>> array = new List<List<GameObject>>();
+    [HideInInspector] public List<GameObject> arrayX;
+    [SerializeField] private GameObject initBlock;
+    [HideInInspector] public GameObject firstBlock;
     private GameObject lastBlock;
     public Color c;
-    public Color cRed;
-    private float timer = 0.5f;
+    private float timer = 0.01f;
     Vector3 direction;
     Vector3 newDirection;
     private List<GameObject> stack = new List<GameObject>();
     int positionInStack = 0;
-    public List<GameObject> lineArray = new List<GameObject>();
+    [HideInInspector]public List<GameObject> lineArray = new List<GameObject>(); //array of unvisited blocks
     int moreBlocks = 0;
-    public int count = 0;
+    [HideInInspector]public int count = 0;
     bool done = false;
     int random = 0;
     [SerializeField] private GameObject passageBlock;
-    int spawnCount = 0;
-    public int count2 = 0;
+    [HideInInspector]public int count2 = 0;
     int number = 0;
 
     void Awake()
@@ -33,28 +30,21 @@ public class Maze : MonoBehaviour
         generateMaze();
     }
 
-    void Start()
-    {
-        Debug.Log("arraySize " + array.Count);
-        Debug.Log("arrayXSize " + arrayX.Count);
-    }
-
-
     void Update()
     {
+        //use countdown timer to make sure CarvePassagesFrom... happens after generateMaze();
        timer = timer - Time.deltaTime;
-
        if(timer <= 0)
        {
-           if(count == 0)
+           if(count == 0) //do this once
            {
-               CarvePassagesFrom(firstBlock.transform, Random.Range(0, 5), false);
+               CarvePassagesFrom(firstBlock.transform); //generates passages between initial green blocks that have spaces
                count++;
            }
 
-            if(count2 == 0 && count > 0)
+            if(count2 == 0 && count > 0) //do this once + got to make sure its done after CarvePassagesFrom
             {
-                foreach (Transform child in this.transform)
+                foreach (Transform child in this.transform) //enable colliders + Visited script on all the blocks that were spawned
                 {
                     child.GetComponent<Collider>().enabled = true;
                     child.GetComponent<Visited>().enabled = true;
@@ -66,7 +56,7 @@ public class Maze : MonoBehaviour
 
     }
 
-    private void generateMaze()
+    private void generateMaze() //generates all the initial blocks for the maze, with spaces between them
     {
         for (int i = 0; i < arraySizeX; i++)
         {
@@ -78,121 +68,82 @@ public class Maze : MonoBehaviour
             {
                 Vector3 pos = Vector3.zero;
 
-                pos = new Vector3(i*2, 0, j*2);
+                pos = new Vector3(i*2, 0, j*2); //*2 used to put spaces so we can after Carve passages between them
 
                 if((i == 0 && j == 0))
                 {
-                    GameObject newBlock = InstantiateBlock(i, j, 1, pos);
+                    GameObject newBlock = InstantiateBlock(i, j, pos);
                     arrayX.Add(newBlock);
                     firstBlock = newBlock;
                 } 
-
-                else arrayX.Add(InstantiateBlock(i, j, 1, pos));
-
-              
+                else arrayX.Add(InstantiateBlock(i, j, pos));
             }
         }
         
     }
 
-    private GameObject InstantiateBlock(int i, int j, int number, Vector3 pos)
+    //used in the generateMaze() to instantiate new blocks at a position + returns the block we just spawned
+    private GameObject InstantiateBlock(int i, int j, Vector3 pos)
     {
-        GameObject randomBlock = null;
-
-        spawnCount++;
-        if(number == 0) randomBlock = goodBlock;
-        else randomBlock = badBlock;
-
-
-        GameObject block = Instantiate(randomBlock, pos, Quaternion.identity, this.gameObject.transform);
-        Debug.Log(spawnCount);
+        GameObject block = Instantiate(initBlock, pos, Quaternion.identity, this.gameObject.transform);
         return block;
     }
 
-    private int CarvePassagesFrom(Transform currentTransform, int randomNumber, bool pass)
+    //used in Update() to carve passages between the green blocks
+    private void CarvePassagesFrom(Transform currentTransform) 
     {
-        
-        if(currentTransform == firstBlock ) moreBlocks++;
-
-        if(moreBlocks > 3)
-        {
-            Debug.Log("Went to start");
-            return 0;
-        } 
-
         if(currentTransform.gameObject.GetComponent<Visited>().visited == false)
         {
             lineArray.Add(currentTransform.gameObject);
             currentTransform.gameObject.GetComponent<Visited>().visited = true;
             currentTransform.gameObject.GetComponent<Renderer>().material.SetColor("_Color", c);
             currentTransform.gameObject.tag = "Walkable";
-            CarvePassagesFrom(currentTransform, 1, true); 
+            CarvePassagesFrom(currentTransform); //recursively call this on current unvisited block
         }
-        else 
+        else //if current is visited than find a neirhboring unvisited block via GoBack...
         {
-
             GoBack(currentTransform);
-
         }
-
-        return moreBlocks;
-
     }
 
+    //called in CarvePassagesFrom, used to find current neighbors
     private void GoBack(Transform currentTransform)
     {
-        int i = (lineArray.Count-1);
-        random = Random.Range(0, 4);
-            bool backout = false;
-                done = false;
-
-               
-               
-               while(i > -1 && backout == false && done == false)
-               {
-                 if(RandomNeighbor(random, lineArray[i], currentTransform.gameObject) == false)
-                   {
-
-                       i--;
-                   }
-                   else done = true;
-
-               }
-               if(i <= -1 && backout == false)
-                {
-                    
-
-                   if(notVisited(currentTransform) == false) return;
-                   backout = true;
-
-                    
-                } 
-              
+        int i = (lineArray.Count-1); //make i = the last block we previously visited
+        random = Random.Range(0, 4); 
+        bool backout = false; //not really necessary /// REMOVE THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!??????????????????????????????????????????????????????????????
+        done = false; //for stopping the while loop
+ 
+        while(i > -1 && backout == false && done == false) //for every visited block choose a random neihgbor and check if its visited or not, if so cut the loop, if not, go to previously visited block
+        {
+            if(RandomNeighbor(random, lineArray[i], currentTransform.gameObject) == false) //if there are no unvisited nieghbors
+            {
+                i--; //decreasing from current lineArray of unvisited nieghbors
+            }
+            else done = true; //if RandomNeighbor returns true, than done = true; cuts the while loop
+        }
+    
+        if(i <= -1 && backout == false) //if RANDOMLY we went through the random unvisited nieghbors of every block in lineArray
+        {
+            if(notVisited(currentTransform) == false) return; //return if we are done looping through all the unvisited neighbors of current
+           // backout = true; //make sure we dont check the if statement + while loop again // probably not necessary but you never know //DELETE THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        }     
     }
 
-    private bool notVisited(Transform currentTransform)
+    private bool notVisited(Transform currentTransform) //while loop function that loops through all visited niehbors (not randomly) and checks if they have unvisited nieghbors one by one
     {
-
-        int j = 0;
-        bool finalBack = false;
-                
-        while(j < lineArray.Count && finalBack == false)
+        int j = 0; //start iteration of visited blocks at 0
+       // bool finalBack = false; // ???????????????????????????????????????????????????????!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        while(j < lineArray.Count) //&& finalBack == false)
         {
+            //GameObject neighbor = null; //IS THIS NECESSARY??????????????!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-            GameObject neighbor = null;
+            int randomNumberAgain = Random.Range(0, 4);
 
-                        
-                        
-            int randomNumberUgg = Random.Range(0, 4);
-
-            Debug.Log(randomNumberUgg + ": randomNumberUgg");
-
-            if( (RandomNess(randomNumberUgg, j, currentTransform)) == false) j++;
-            else return true;
-
-
+            if((RandomNess(randomNumberAgain, j, currentTransform)) == false) j++; //if the current block has no unvisited neighbors, selected in randomOrder, than go to next block in lineArray 
+            else return true; //returning true when we havent found a next unvisited block to go to
         }
-         return false;
+        return false; //returns false when we found a next unvisited block and are calculating 
     }
 
         private bool RandomNess(int number, int j, Transform currentTransform)
@@ -207,7 +158,7 @@ public class Maze : MonoBehaviour
                            Vector3 pos = new Vector3((int)(lineArray[j].GetComponent<Visited>().neighborRight.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (int)(lineArray[j].GetComponent<Visited>().neighborRight.transform.position.z - lineArray[j].transform.position.z)/2 + lineArray[j].transform.position.z);
                             Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
 
-                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborRight.transform, 0, false);
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborRight.transform);
 
                             return true;
 
@@ -219,7 +170,7 @@ public class Maze : MonoBehaviour
                              Vector3 pos = new Vector3((int)(lineArray[j].GetComponent<Visited>().neighborLeft.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (int)(lineArray[j].GetComponent<Visited>().neighborLeft.transform.position.z - lineArray[j].transform.position.z + lineArray[j].transform.position.z)/2);
                             Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
 
-                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborLeft.transform, 0, false);
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborLeft.transform);
 
                             return true;
 
@@ -231,7 +182,7 @@ public class Maze : MonoBehaviour
                             Vector3 pos = new Vector3((int)(lineArray[j].GetComponent<Visited>().neighborUp.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (int)(lineArray[j].GetComponent<Visited>().neighborUp.transform.position.z - lineArray[j].transform.position.z)/2 + lineArray[j].transform.position.z);
                             Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
 
-                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborUp.transform, 0, false);
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborUp.transform);
 
                            return true;
                         }
@@ -242,7 +193,7 @@ public class Maze : MonoBehaviour
                             Vector3 pos = new Vector3((int)(lineArray[j].GetComponent<Visited>().neighborDown.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (int)(lineArray[j].GetComponent<Visited>().neighborDown.transform.position.z - lineArray[j].transform.position.z)/2 + lineArray[j].transform.position.z);
                             Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
 
-                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborDown.transform, 0, false);
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborDown.transform);
 
                             return true;
 
@@ -257,7 +208,7 @@ public class Maze : MonoBehaviour
                            Debug.Log("do we even get here?5");
                             Vector3 pos = new Vector3((int)(lineArray[j].GetComponent<Visited>().neighborLeft.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (int)(lineArray[j].GetComponent<Visited>().neighborLeft.transform.position.z - lineArray[j].transform.position.z)/2 + lineArray[j].transform.position.z);
                             Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
-                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborLeft.transform, 0, false);
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborLeft.transform);
 
                             return true;
 
@@ -268,7 +219,7 @@ public class Maze : MonoBehaviour
                           Vector3 pos = new Vector3((int)(lineArray[j].GetComponent<Visited>().neighborUp.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (int)(lineArray[j].GetComponent<Visited>().neighborUp.transform.position.z - lineArray[j].transform.position.z)/2 + lineArray[j].transform.position.z);
                             Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
                            Debug.Log("do we even get here?6");
-                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborUp.transform, 0, false);
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborUp.transform);
 
                            return true;
                         }
@@ -278,7 +229,7 @@ public class Maze : MonoBehaviour
                            Debug.Log("do we even get here?7");
                            Vector3 pos = new Vector3((int)(lineArray[j].GetComponent<Visited>().neighborDown.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (int)(lineArray[j].GetComponent<Visited>().neighborDown.transform.position.z - lineArray[j].transform.position.z)/2 + lineArray[j].transform.position.z);
                             Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
-                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborDown.transform, 0, false);
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborDown.transform);
 
                             return true;
 
@@ -290,7 +241,7 @@ public class Maze : MonoBehaviour
                              Vector3 pos = new Vector3((int)(lineArray[j].GetComponent<Visited>().neighborRight.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (int)(lineArray[j].GetComponent<Visited>().neighborRight.transform.position.z - lineArray[j].transform.position.z)/2 + lineArray[j].transform.position.z);
                             Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
 
-                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborRight.transform, 0, false);
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborRight.transform);
                             
                             return true;
 
@@ -304,7 +255,7 @@ public class Maze : MonoBehaviour
                          Vector3 pos = new Vector3((int)(lineArray[j].GetComponent<Visited>().neighborUp.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (int)(lineArray[j].GetComponent<Visited>().neighborUp.transform.position.z - lineArray[j].transform.position.z)/2 + lineArray[j].transform.position.z);
                             Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
                            Debug.Log("do we even get here?9");
-                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborUp.transform, 0, false);
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborUp.transform);
 
                            return true;
                         }
@@ -314,7 +265,7 @@ public class Maze : MonoBehaviour
                            Debug.Log("do we even get here?11");
                            Vector3 pos = new Vector3((int)(lineArray[j].GetComponent<Visited>().neighborDown.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (int)(lineArray[j].GetComponent<Visited>().neighborDown.transform.position.z - lineArray[j].transform.position.z)/2 + lineArray[j].transform.position.z);
                             Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
-                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborDown.transform, 0, false);
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborDown.transform);
 
                             return true;
 
@@ -325,7 +276,7 @@ public class Maze : MonoBehaviour
                              Vector3 pos = new Vector3((int)(lineArray[j].GetComponent<Visited>().neighborRight.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (int)(lineArray[j].GetComponent<Visited>().neighborRight.transform.position.z - lineArray[j].transform.position.z)/2 + lineArray[j].transform.position.z);
                             Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
 
-                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborRight.transform, 0, false);
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborRight.transform);
                             return true;
                         }
                         else if(lineArray[j].GetComponent<Visited>().neighborLeft != null && lineArray[j].GetComponent<Visited>().neighborLeft.GetComponent<Visited>().visited == false)
@@ -333,7 +284,7 @@ public class Maze : MonoBehaviour
                             Debug.Log("do we even get here?13");
                             Vector3 pos = new Vector3((int)(lineArray[j].GetComponent<Visited>().neighborLeft.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (int)(lineArray[j].GetComponent<Visited>().neighborLeft.transform.position.z - lineArray[j].transform.position.z)/2 + lineArray[j].transform.position.z);
                             Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
-                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborLeft.transform, 0, false);
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborLeft.transform);
 
                             return true;
 
@@ -348,7 +299,7 @@ public class Maze : MonoBehaviour
                            Debug.Log("do we even get here?14");
                            Vector3 pos = new Vector3((int)(lineArray[j].GetComponent<Visited>().neighborDown.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (int)(lineArray[j].GetComponent<Visited>().neighborDown.transform.position.z - lineArray[j].transform.position.z)/2 + lineArray[j].transform.position.z);
                             Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
-                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborDown.transform, 0, false);
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborDown.transform);
 
                             return true;
                         }
@@ -358,7 +309,7 @@ public class Maze : MonoBehaviour
                              Vector3 pos = new Vector3((int)(lineArray[j].GetComponent<Visited>().neighborRight.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (int)(lineArray[j].GetComponent<Visited>().neighborRight.transform.position.z - lineArray[j].transform.position.z)/2+ lineArray[j].transform.position.z );
                             Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
 
-                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborRight.transform, 0, false);
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborRight.transform);
                             return true;
 
                         }
@@ -368,7 +319,7 @@ public class Maze : MonoBehaviour
                             Debug.Log("do we even get here?16");
                             Vector3 pos = new Vector3((int)(lineArray[j].GetComponent<Visited>().neighborLeft.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (int)(lineArray[j].GetComponent<Visited>().neighborLeft.transform.position.z - lineArray[j].transform.position.z)/2 + lineArray[j].transform.position.z);
                             Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
-                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborLeft.transform, 0, false);
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborLeft.transform);
 
                             return true;
 
@@ -379,7 +330,7 @@ public class Maze : MonoBehaviour
                            Vector3 pos = new Vector3((int)(lineArray[j].GetComponent<Visited>().neighborUp.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (int)(lineArray[j].GetComponent<Visited>().neighborUp.transform.position.z - lineArray[j].transform.position.z)/2 + lineArray[j].transform.position.z );
                             Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
                            Debug.Log("do we even get here?17");
-                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborUp.transform, 0, false);
+                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborUp.transform);
                            return true;
                         }
             }
@@ -388,7 +339,7 @@ public class Maze : MonoBehaviour
 
         }
 
-
+    //called in GoBack, returns true if we found an unvisited neighbor of current block, than continue Carving passage restarting at this unvisited neihbor
     private bool RandomNeighbor(int random, GameObject go, GameObject current)
     {
         GameObject neighbor = null;
@@ -412,7 +363,7 @@ public class Maze : MonoBehaviour
                 Vector3 pos = new Vector3((int)((go.GetComponent<Visited>().neighborRight.transform.position.x - go.transform.position.x)/2 + go.transform.position.x), 0, (int)(go.GetComponent<Visited>().neighborRight.transform.position.z - go.transform.position.z)/2 + go.transform.position.z);
                 Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
 
-                CarvePassagesFrom(go.GetComponent<Visited>().neighborRight.transform, 0, false);
+                CarvePassagesFrom(go.GetComponent<Visited>().neighborRight.transform);
                 return true;
             }
             else 
@@ -429,7 +380,7 @@ public class Maze : MonoBehaviour
                 done = true;
                 Vector3 pos = new Vector3(((int)(go.GetComponent<Visited>().neighborDown.transform.position.x - go.transform.position.x)/2 + go.transform.position.x), 0, (int)(go.GetComponent<Visited>().neighborDown.transform.position.z - go.transform.position.z)/2 + go.transform.position.z);
                 Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
-                CarvePassagesFrom(go.GetComponent<Visited>().neighborDown.transform, 0, false);
+                CarvePassagesFrom(go.GetComponent<Visited>().neighborDown.transform);
                 return true;
             }
             else return false;
@@ -446,7 +397,7 @@ public class Maze : MonoBehaviour
                 Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
                 Debug.Log("hello its me3");
                 done = true;
-                CarvePassagesFrom(go.GetComponent<Visited>().neighborUp.transform, 0, false);
+                CarvePassagesFrom(go.GetComponent<Visited>().neighborUp.transform);
                 return true;
             }
             else return false;
@@ -462,7 +413,7 @@ public class Maze : MonoBehaviour
                 done = true;
                 Vector3 pos = new Vector3((int)((go.GetComponent<Visited>().neighborLeft.transform.position.x - go.transform.position.x)/2 + go.transform.position.x), 0, (int)(go.GetComponent<Visited>().neighborLeft.transform.position.z - go.transform.position.z)/2 + go.transform.position.z);
                 Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
-                CarvePassagesFrom(go.GetComponent<Visited>().neighborLeft.transform, 0, false);
+                CarvePassagesFrom(go.GetComponent<Visited>().neighborLeft.transform);
                 return true;
             }
             else return false;

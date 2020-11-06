@@ -109,8 +109,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   visited: 0
+  playerVisited: 0
   walls: 01010101
   neighborRight: {fileID: 0}
   neighborLeft: {fileID: 0}
   neighborUp: {fileID: 0}
   neighborDown: {fileID: 0}
+  newNeighborRight: {fileID: 0}
+  newNeighborLeft: {fileID: 0}
+  newNeighborUp: {fileID: 0}
+  newNeighborDown: {fileID: 0}
+  neighbors: []
+  count: 0
