@@ -12,18 +12,12 @@ public class Maze : MonoBehaviour
     private GameObject lastBlock;
     public Color c; //green color to show that the block is walkable
     private float timer = 0.01f;
-    Vector3 direction;
-    Vector3 newDirection;
-    private List<GameObject> stack = new List<GameObject>();
-    int positionInStack = 0;
-    [HideInInspector]public List<GameObject> lineArray = new List<GameObject>(); //array of unvisited blocks
-    int moreBlocks = 0;
-    [HideInInspector]public int count = 0;
-    bool done = false;
-    int random = 0;
+    [HideInInspector] public List<GameObject> lineArray = new List<GameObject>(); //array of unvisited blocks
+    [HideInInspector] public int count = 0;
+    private bool done = false;
+    private int random = 0;
     [SerializeField] private GameObject passageBlock;
     [HideInInspector]public int count2 = 0;
-    int number = 0;
 
     void Awake()
     {
@@ -192,90 +186,45 @@ public class Maze : MonoBehaviour
         else return false;
     }
 
-    //called in GoBack, returns true if we found an unvisited neighbor of current block, than continue Carving passage restarting at this unvisited neihbor
+    //called in GoBack, returns true if we found an unvisited neighbor of current block, than continue Carving passage restarting at this unvisited neihgbor
     private bool RandomNeighbor(int random, GameObject go, GameObject current)
     {
         GameObject neighbor = null;
 
+        //fill the neighbor gameobject with appropriate neighbor
         if(go.GetComponent<Visited>().neighborRight != null) neighbor = go.GetComponent<Visited>().neighborRight;
         else if(go.GetComponent<Visited>().neighborLeft!= null) neighbor = go.GetComponent<Visited>().neighborLeft;
         else if(go.GetComponent<Visited>().neighborUp != null) neighbor = go.GetComponent<Visited>().neighborUp;
         else if(go.GetComponent<Visited>().neighborDown!= null) neighbor = go.GetComponent<Visited>().neighborDown;
-        else Debug.Log("fail1");
 
-
-        if(random == 0)
+        //determines which nieghbor we are doing the visited check on
+        switch(random)
         {
-            Debug.Log("testtt0");
-            if(go.GetComponent<Visited>().neighborRight != null && go.GetComponent<Visited>().neighborRight.GetComponent<Visited>().visited == false)
-            {
-                // lineArray.Remove(lineArray[i]);
-                Debug.Log("hello its me");
-                done = true;
-
-                Vector3 pos = new Vector3((int)((go.GetComponent<Visited>().neighborRight.transform.position.x - go.transform.position.x)/2 + go.transform.position.x), 0, (int)(go.GetComponent<Visited>().neighborRight.transform.position.z - go.transform.position.z)/2 + go.transform.position.z);
-                Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
-
-                CarvePassagesFrom(go.GetComponent<Visited>().neighborRight.transform);
-                return true;
-            }
-            else 
-            {
-                return false;
-            }
+            case 0:
+                return RandomNeighborCheck(go, go.GetComponent<Visited>().neighborRight);
+            case 1:
+                return RandomNeighborCheck(go, go.GetComponent<Visited>().neighborDown);
+            case 2:
+                return RandomNeighborCheck(go, go.GetComponent<Visited>().neighborUp);
+            case 3:
+                return RandomNeighborCheck(go, go.GetComponent<Visited>().neighborLeft);
         }
-        else if(random == 1)
-        {
-            Debug.Log("testtt1");
-            if(go.GetComponent<Visited>().neighborDown != null && go.GetComponent<Visited>().neighborDown.GetComponent<Visited>().visited == false)
-            {
-                Debug.Log("hello its me2");
-                done = true;
-                Vector3 pos = new Vector3(((int)(go.GetComponent<Visited>().neighborDown.transform.position.x - go.transform.position.x)/2 + go.transform.position.x), 0, (int)(go.GetComponent<Visited>().neighborDown.transform.position.z - go.transform.position.z)/2 + go.transform.position.z);
-                Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
-                CarvePassagesFrom(go.GetComponent<Visited>().neighborDown.transform);
-                return true;
-            }
-            else return false;
-
-        }
-        else if(random == 2)
-        {
-            Debug.Log("testtt2");
-            if(go.GetComponent<Visited>().neighborUp != null && go.GetComponent<Visited>().neighborUp.GetComponent<Visited>().visited == false)
-            {
-                
-                // lineArray.Remove(lineArray[i]);
-                Vector3 pos = new Vector3((int)((go.GetComponent<Visited>().neighborUp.transform.position.x - go.transform.position.x)/2 + go.transform.position.x), 0, (int)(go.GetComponent<Visited>().neighborUp.transform.position.z - go.transform.position.z)/2 + go.transform.position.z);
-                Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
-                Debug.Log("hello its me3");
-                done = true;
-                CarvePassagesFrom(go.GetComponent<Visited>().neighborUp.transform);
-                return true;
-            }
-            else return false;
-
-        }
-        else if(random == 3)
-        {
-            Debug.Log("testtt");
-            if(go.GetComponent<Visited>().neighborLeft != null && go.GetComponent<Visited>().neighborLeft.GetComponent<Visited>().visited == false)
-            {
-                
-                Debug.Log("hello its me4");
-                done = true;
-                Vector3 pos = new Vector3((int)((go.GetComponent<Visited>().neighborLeft.transform.position.x - go.transform.position.x)/2 + go.transform.position.x), 0, (int)(go.GetComponent<Visited>().neighborLeft.transform.position.z - go.transform.position.z)/2 + go.transform.position.z);
-                Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
-                CarvePassagesFrom(go.GetComponent<Visited>().neighborLeft.transform);
-                return true;
-            }
-            else return false;
-          
-        }
-        else return false;
-
+        return false;
     }
 
+    //called in RandomNeighbor, returns true when we carve a passage to an unvisited neighbor from the input
+    private bool RandomNeighborCheck(GameObject go, GameObject neighbor)
+    {
+        if(neighbor != null && neighbor.GetComponent<Visited>().visited == false)
+        {
+            done = true;
+            Vector3 pos = new Vector3((int)((neighbor.transform.position.x - go.transform.position.x)/2 + go.transform.position.x), 0, (int)(neighbor.transform.position.z - go.transform.position.z)/2 + go.transform.position.z);
+            Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
+            CarvePassagesFrom(neighbor.transform);
+            return true;
+        }
+        else return false;
+    }
 
 }
 
