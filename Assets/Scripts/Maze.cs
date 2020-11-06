@@ -10,7 +10,7 @@ public class Maze : MonoBehaviour
     [SerializeField] private GameObject initBlock;
     [HideInInspector] public GameObject firstBlock;
     private GameObject lastBlock;
-    public Color c;
+    public Color c; //green color to show that the block is walkable
     private float timer = 0.01f;
     Vector3 direction;
     Vector3 newDirection;
@@ -111,10 +111,9 @@ public class Maze : MonoBehaviour
     {
         int i = (lineArray.Count-1); //make i = the last block we previously visited
         random = Random.Range(0, 4); 
-        bool backout = false; //not really necessary /// REMOVE THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!??????????????????????????????????????????????????????????????
         done = false; //for stopping the while loop
  
-        while(i > -1 && backout == false && done == false) //for every visited block choose a random neihgbor and check if its visited or not, if so cut the loop, if not, go to previously visited block
+        while(i > -1 && done == false) //for every visited block choose a random neihgbor and check if its visited or not, if so cut the loop, if not, go to previously visited block
         {
             if(RandomNeighbor(random, lineArray[i], currentTransform.gameObject) == false) //if there are no unvisited nieghbors
             {
@@ -123,221 +122,75 @@ public class Maze : MonoBehaviour
             else done = true; //if RandomNeighbor returns true, than done = true; cuts the while loop
         }
     
-        if(i <= -1 && backout == false) //if RANDOMLY we went through the random unvisited nieghbors of every block in lineArray
+        if(i <= -1) //if RANDOMLY we went through the random unvisited nieghbors of every block in lineArray
         {
             if(notVisited(currentTransform) == false) return; //return if we are done looping through all the unvisited neighbors of current
-           // backout = true; //make sure we dont check the if statement + while loop again // probably not necessary but you never know //DELETE THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         }     
     }
 
     private bool notVisited(Transform currentTransform) //while loop function that loops through all visited niehbors (not randomly) and checks if they have unvisited nieghbors one by one
     {
         int j = 0; //start iteration of visited blocks at 0
-       // bool finalBack = false; // ???????????????????????????????????????????????????????!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         while(j < lineArray.Count) //&& finalBack == false)
         {
-            //GameObject neighbor = null; //IS THIS NECESSARY??????????????!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
             int randomNumberAgain = Random.Range(0, 4);
 
-            if((RandomNess(randomNumberAgain, j, currentTransform)) == false) j++; //if the current block has no unvisited neighbors, selected in randomOrder, than go to next block in lineArray 
+            if((RandomNess(randomNumberAgain, j)) == false) j++; //if the current block has no unvisited neighbors, selected in randomOrder, than go to next block in lineArray 
             else return true; //returning true when we havent found a next unvisited block to go to
         }
         return false; //returns false when we found a next unvisited block and are calculating 
     }
 
-        private bool RandomNess(int number, int j, Transform currentTransform)
+    private bool RandomNess(int number, int j)
+    {
+        //switch case for number  //depending on this number the order of checking each unvisited number will change
+        switch(number)
         {
-            if(number == 0)
-            {
-
-                if(lineArray[j].GetComponent<Visited>().neighborRight != null && lineArray[j].GetComponent<Visited>().neighborRight.gameObject.GetComponent<Visited>().visited == false)
-                        {
-                            Debug.Log("do we even get here?1");
-
-                           Vector3 pos = new Vector3((int)(lineArray[j].GetComponent<Visited>().neighborRight.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (int)(lineArray[j].GetComponent<Visited>().neighborRight.transform.position.z - lineArray[j].transform.position.z)/2 + lineArray[j].transform.position.z);
-                            Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
-
-                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborRight.transform);
-
-                            return true;
-
-                        }
-                        else if(lineArray[j].GetComponent<Visited>().neighborLeft != null && lineArray[j].GetComponent<Visited>().neighborLeft.GetComponent<Visited>().visited == false)
-                        {
-
-                           Debug.Log("do we even get here?2");
-                             Vector3 pos = new Vector3((int)(lineArray[j].GetComponent<Visited>().neighborLeft.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (int)(lineArray[j].GetComponent<Visited>().neighborLeft.transform.position.z - lineArray[j].transform.position.z + lineArray[j].transform.position.z)/2);
-                            Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
-
-                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborLeft.transform);
-
-                            return true;
-
-                        }
-                        else if(lineArray[j].GetComponent<Visited>().neighborUp != null && lineArray[j].GetComponent<Visited>().neighborUp.GetComponent<Visited>().visited == false)
-                        {
-
-                          Debug.Log("do we even get here?3");
-                            Vector3 pos = new Vector3((int)(lineArray[j].GetComponent<Visited>().neighborUp.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (int)(lineArray[j].GetComponent<Visited>().neighborUp.transform.position.z - lineArray[j].transform.position.z)/2 + lineArray[j].transform.position.z);
-                            Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
-
-                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborUp.transform);
-
-                           return true;
-                        }
-                        else if(lineArray[j].GetComponent<Visited>().neighborDown != null && lineArray[j].GetComponent<Visited>().neighborDown.GetComponent<Visited>().visited == false)
-                        {
-
-                          Debug.Log("do we even get here?4");
-                            Vector3 pos = new Vector3((int)(lineArray[j].GetComponent<Visited>().neighborDown.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (int)(lineArray[j].GetComponent<Visited>().neighborDown.transform.position.z - lineArray[j].transform.position.z)/2 + lineArray[j].transform.position.z);
-                            Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
-
-                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborDown.transform);
-
-                            return true;
-
-                        }
-            }
-            else if(random == 1)
-            {
-                
-                        if(lineArray[j].GetComponent<Visited>().neighborLeft != null && lineArray[j].GetComponent<Visited>().neighborLeft.GetComponent<Visited>().visited == false)
-                        {
-
-                           Debug.Log("do we even get here?5");
-                            Vector3 pos = new Vector3((int)(lineArray[j].GetComponent<Visited>().neighborLeft.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (int)(lineArray[j].GetComponent<Visited>().neighborLeft.transform.position.z - lineArray[j].transform.position.z)/2 + lineArray[j].transform.position.z);
-                            Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
-                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborLeft.transform);
-
-                            return true;
-
-                        }
-                        else if(lineArray[j].GetComponent<Visited>().neighborUp != null && lineArray[j].GetComponent<Visited>().neighborUp.GetComponent<Visited>().visited == false)
-                        {
-
-                          Vector3 pos = new Vector3((int)(lineArray[j].GetComponent<Visited>().neighborUp.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (int)(lineArray[j].GetComponent<Visited>().neighborUp.transform.position.z - lineArray[j].transform.position.z)/2 + lineArray[j].transform.position.z);
-                            Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
-                           Debug.Log("do we even get here?6");
-                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborUp.transform);
-
-                           return true;
-                        }
-                        else if(lineArray[j].GetComponent<Visited>().neighborDown != null && lineArray[j].GetComponent<Visited>().neighborDown.GetComponent<Visited>().visited == false)
-                        {
-
-                           Debug.Log("do we even get here?7");
-                           Vector3 pos = new Vector3((int)(lineArray[j].GetComponent<Visited>().neighborDown.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (int)(lineArray[j].GetComponent<Visited>().neighborDown.transform.position.z - lineArray[j].transform.position.z)/2 + lineArray[j].transform.position.z);
-                            Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
-                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborDown.transform);
-
-                            return true;
-
-                        }
-                        else if(lineArray[j].GetComponent<Visited>().neighborRight != null && lineArray[j].GetComponent<Visited>().neighborRight.gameObject.GetComponent<Visited>().visited == false)
-                        {
-                            Debug.Log("do we even get here?8");
-
-                             Vector3 pos = new Vector3((int)(lineArray[j].GetComponent<Visited>().neighborRight.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (int)(lineArray[j].GetComponent<Visited>().neighborRight.transform.position.z - lineArray[j].transform.position.z)/2 + lineArray[j].transform.position.z);
-                            Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
-
-                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborRight.transform);
-                            
-                            return true;
-
-                        }
-            }
-            else if(random == 2)
-            {
-                if(lineArray[j].GetComponent<Visited>().neighborUp != null && lineArray[j].GetComponent<Visited>().neighborUp.GetComponent<Visited>().visited == false)
-                        {
-
-                         Vector3 pos = new Vector3((int)(lineArray[j].GetComponent<Visited>().neighborUp.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (int)(lineArray[j].GetComponent<Visited>().neighborUp.transform.position.z - lineArray[j].transform.position.z)/2 + lineArray[j].transform.position.z);
-                            Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
-                           Debug.Log("do we even get here?9");
-                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborUp.transform);
-
-                           return true;
-                        }
-                        else if(lineArray[j].GetComponent<Visited>().neighborDown != null && lineArray[j].GetComponent<Visited>().neighborDown.GetComponent<Visited>().visited == false)
-                        {
-
-                           Debug.Log("do we even get here?11");
-                           Vector3 pos = new Vector3((int)(lineArray[j].GetComponent<Visited>().neighborDown.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (int)(lineArray[j].GetComponent<Visited>().neighborDown.transform.position.z - lineArray[j].transform.position.z)/2 + lineArray[j].transform.position.z);
-                            Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
-                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborDown.transform);
-
-                            return true;
-
-                        }
-                        else if(lineArray[j].GetComponent<Visited>().neighborRight != null && lineArray[j].GetComponent<Visited>().neighborRight.gameObject.GetComponent<Visited>().visited == false)
-                        {
-                            Debug.Log("do we even get here?12");
-                             Vector3 pos = new Vector3((int)(lineArray[j].GetComponent<Visited>().neighborRight.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (int)(lineArray[j].GetComponent<Visited>().neighborRight.transform.position.z - lineArray[j].transform.position.z)/2 + lineArray[j].transform.position.z);
-                            Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
-
-                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborRight.transform);
-                            return true;
-                        }
-                        else if(lineArray[j].GetComponent<Visited>().neighborLeft != null && lineArray[j].GetComponent<Visited>().neighborLeft.GetComponent<Visited>().visited == false)
-                        {
-                            Debug.Log("do we even get here?13");
-                            Vector3 pos = new Vector3((int)(lineArray[j].GetComponent<Visited>().neighborLeft.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (int)(lineArray[j].GetComponent<Visited>().neighborLeft.transform.position.z - lineArray[j].transform.position.z)/2 + lineArray[j].transform.position.z);
-                            Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
-                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborLeft.transform);
-
-                            return true;
-
-                        }
-            }
-            else if(random == 3)
-            {
-                
-                        if(lineArray[j].GetComponent<Visited>().neighborDown != null && lineArray[j].GetComponent<Visited>().neighborDown.GetComponent<Visited>().visited == false)
-                        {
-
-                           Debug.Log("do we even get here?14");
-                           Vector3 pos = new Vector3((int)(lineArray[j].GetComponent<Visited>().neighborDown.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (int)(lineArray[j].GetComponent<Visited>().neighborDown.transform.position.z - lineArray[j].transform.position.z)/2 + lineArray[j].transform.position.z);
-                            Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
-                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborDown.transform);
-
-                            return true;
-                        }
-                        else if(lineArray[j].GetComponent<Visited>().neighborRight != null && lineArray[j].GetComponent<Visited>().neighborRight.gameObject.GetComponent<Visited>().visited == false)
-                        {
-                            Debug.Log("do we even get here?15");
-                             Vector3 pos = new Vector3((int)(lineArray[j].GetComponent<Visited>().neighborRight.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (int)(lineArray[j].GetComponent<Visited>().neighborRight.transform.position.z - lineArray[j].transform.position.z)/2+ lineArray[j].transform.position.z );
-                            Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
-
-                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborRight.transform);
-                            return true;
-
-                        }
-                        else if(lineArray[j].GetComponent<Visited>().neighborLeft != null && lineArray[j].GetComponent<Visited>().neighborLeft.GetComponent<Visited>().visited == false)
-                        {
-
-                            Debug.Log("do we even get here?16");
-                            Vector3 pos = new Vector3((int)(lineArray[j].GetComponent<Visited>().neighborLeft.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (int)(lineArray[j].GetComponent<Visited>().neighborLeft.transform.position.z - lineArray[j].transform.position.z)/2 + lineArray[j].transform.position.z);
-                            Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
-                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborLeft.transform);
-
-                            return true;
-
-                        }
-                        else if(lineArray[j].GetComponent<Visited>().neighborUp != null && lineArray[j].GetComponent<Visited>().neighborUp.GetComponent<Visited>().visited == false)
-                        {
-
-                           Vector3 pos = new Vector3((int)(lineArray[j].GetComponent<Visited>().neighborUp.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (int)(lineArray[j].GetComponent<Visited>().neighborUp.transform.position.z - lineArray[j].transform.position.z)/2 + lineArray[j].transform.position.z );
-                            Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
-                           Debug.Log("do we even get here?17");
-                            CarvePassagesFrom(lineArray[j].GetComponent<Visited>().neighborUp.transform);
-                           return true;
-                        }
-            }
-
-                     return false;   
-
+            case 0:
+                if(NeighborCheck(lineArray[j].GetComponent<Visited>().neighborRight, j) == true) return true;
+                else if(NeighborCheck(lineArray[j].GetComponent<Visited>().neighborLeft, j) == true) return true;
+                else if(NeighborCheck(lineArray[j].GetComponent<Visited>().neighborUp, j) == true) return true;
+                else if(NeighborCheck(lineArray[j].GetComponent<Visited>().neighborDown, j) == true) return true;
+                else return false;
+               // break; //normally you use a break; in a switch case but here we actually return something so there is no need
+            case 1:
+                if(NeighborCheck(lineArray[j].GetComponent<Visited>().neighborLeft, j) == true) return true;
+                else if(NeighborCheck(lineArray[j].GetComponent<Visited>().neighborUp, j) == true) return true;
+                else if(NeighborCheck(lineArray[j].GetComponent<Visited>().neighborDown, j) == true) return true;
+                else if(NeighborCheck(lineArray[j].GetComponent<Visited>().neighborRight, j) == true) return true;
+                else return false;
+               // break; //normally you use a break; in a switch case but here we actually return something so there is no need
+            case 2:
+                if(NeighborCheck(lineArray[j].GetComponent<Visited>().neighborUp, j) == true) return true;
+                else if(NeighborCheck(lineArray[j].GetComponent<Visited>().neighborDown, j) == true) return true;
+                else if(NeighborCheck(lineArray[j].GetComponent<Visited>().neighborRight, j) == true) return true;
+                else if(NeighborCheck(lineArray[j].GetComponent<Visited>().neighborLeft, j) == true) return true;
+                else return false;
+                //break; //normally you use a break; in a switch case but here we actually return something so there is no need
+            case 3:
+                if(NeighborCheck(lineArray[j].GetComponent<Visited>().neighborDown, j) == true) return true;
+                else if(NeighborCheck(lineArray[j].GetComponent<Visited>().neighborRight, j) == true) return true;
+                else if(NeighborCheck(lineArray[j].GetComponent<Visited>().neighborLeft, j) == true) return true;
+                else if(NeighborCheck(lineArray[j].GetComponent<Visited>().neighborUp, j) == true) return true;
+                else return false;
+               // break; //normally you use a break; in a switch case but here we actually return something so there is no need
         }
+            
+        return false;
+    }
+    
+    //called inside RandomNess, for every neighbor we want to check if unvisited, than instantiate a passage block to carve a passage between the nieghbor and current block in lineArray
+    public bool NeighborCheck(GameObject neighbor, int j)
+    {
+        if(neighbor != null && neighbor.GetComponent<Visited>().visited == false)
+        {
+            Vector3 pos = new Vector3((int)(neighbor.transform.position.x - lineArray[j].transform.position.x)/2 + lineArray[j].transform.position.x, 0, (int)(neighbor.transform.position.z - lineArray[j].transform.position.z)/2 + lineArray[j].transform.position.z );
+            Instantiate(passageBlock, pos, Quaternion.identity, this.gameObject.transform);
+            CarvePassagesFrom(neighbor.transform);
+            return true; //if we were able to carve a passage
+        }
+        else return false;
+    }
 
     //called in GoBack, returns true if we found an unvisited neighbor of current block, than continue Carving passage restarting at this unvisited neihbor
     private bool RandomNeighbor(int random, GameObject go, GameObject current)
