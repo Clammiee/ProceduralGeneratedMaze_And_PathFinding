@@ -6,7 +6,6 @@ public class Visited : MonoBehaviour
 {
     public bool visited = false;
     public bool playerVisited = false;
-    public List<bool> walls = new List<bool>(); 
 
     public GameObject neighborRight;
     public GameObject neighborLeft;
@@ -17,30 +16,15 @@ public class Visited : MonoBehaviour
     public GameObject newNeighborLeft;
     public GameObject newNeighborUp;
     public GameObject newNeighborDown;
-    //public List<GameObject> oldNeighbors = new List<GameObject>();
     public List<GameObject> neighbors = new List<GameObject>();
-    public int count = 0;
-
-
-
-    void Awake()
-    {
-        
-    }
+    [HideInInspector] public int count = 0;
 
     void Start()
     {
-
-
-       neighborRight = FindNeighbor(this.transform.right);
+        neighborRight = FindNeighbor(this.transform.right);
         neighborLeft = FindNeighbor(-this.transform.right);
         neighborUp = FindNeighbor(this.transform.forward);
         neighborDown = FindNeighbor(-this.transform.forward);
-
-      /*  if(neighborRight!= null) oldNeighbors.Add(neighborRight);
-        if(neighborLeft!= null) oldNeighbors.Add(neighborLeft);
-        if(neighborUp!= null) oldNeighbors.Add(neighborUp);
-        if(neighborDown!= null) oldNeighbors.Add(neighborDown); */
     }   
 
 

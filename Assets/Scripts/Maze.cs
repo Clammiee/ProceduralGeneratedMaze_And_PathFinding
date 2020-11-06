@@ -17,7 +17,7 @@ public class Maze : MonoBehaviour
     private bool done = false;
     private int random = 0;
     [SerializeField] private GameObject passageBlock;
-    [HideInInspector]public int count2 = 0;
+    [HideInInspector] public int count2 = 0;
 
     void Awake()
     {
