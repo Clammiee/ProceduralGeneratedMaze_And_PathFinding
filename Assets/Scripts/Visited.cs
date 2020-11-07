@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Visited : MonoBehaviour
+public class Visited : MonoBehaviour //attached to every block object
 {
     public bool visited = false;
     public bool playerVisited = false;

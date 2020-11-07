@@ -81,7 +81,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    //called in FindPath, adds directions from destination to start in direction list, in order, so that we can hop from start to finish
+    //called in FindPath, adds directions from destination to start in direction list, in reversed order, so that we can hop from start to finish
     private void Repeat(GameObject go, GameObject current, GameObject final, GameObject secondFinal)
     {
         int iteration = 0;
@@ -89,91 +89,37 @@ public class Player : MonoBehaviour
         bool gotFinal = false;
         bool gotSecondFinal = false;
 
-        if(secondFinal == null) //in most cases this if statement is always used
-        {
-            for (int i = 0; i < first.Count; i++)
-              {
-                    if(first[i] == direction[direction.Count-1])
-                    {
-                        direction.Add(first[i]);
-                        final = first[i];
-                        iteration = i;
-                        int nieghborCount = 0;
-
-                        if(final != null)
-                        {
-                            foreach (GameObject finalNeighbor in final.GetComponent<Visited>().neighbors)
-                            {
-                                if(second[iteration] != finalNeighbor) nieghborCount++;
-                            }
-                            if(nieghborCount == final.GetComponent<Visited>().neighbors.Count) secondFinal = second[iteration];
-                            else 
-                            {
-                                direction.Add(second[iteration]);
-                                if(final != null && (direction[direction.Count-1].transform.position != upSide && direction[direction.Count-1].transform.position != rightSide)) Repeat(go, current, final, secondFinal);
-                                else
-                                {   
-                                    done = true;
-                                    return;
-                                } 
-                            }
-                        }
-                    } 
-              }
-        }
-        else if(secondFinal != null) //in case if the if statement from above is not true
+        if(secondFinal == null)
         {
             for (int i = 0; i < first.Count; i++)
             {
-                if(secondFinal == first[i])
+                if(first[i] == direction[direction.Count-1])
                 {
-                    if(second[i].GetComponent<Visited>() != null)
-                        {
-                            if(second[i].GetComponent<Visited>().neighbors != null && second[i].GetComponent<Visited>().neighbors.Count > 0 && second[i].GetComponent<Visited>().enabled == true)
-                            {
-                                foreach (GameObject neighbor in second[i].GetComponent<Visited>().neighbors)
-                                {
-                                    if(neighbor == final)
-                                    {
-                                        direction.Add(neighbor);    
-                                        final = second[i];
-                                        gotFinal = true;
-                                    }
-                                }
-                            }
-                        }
-                }
-            }
-                if(final != null && final.GetComponent<Visited>() != null)
-                {
+                    direction.Add(first[i]);
+                    final = first[i];
+                    iteration = i;
                     int nieghborCount = 0;
 
-                    if(final.GetComponent<Visited>().neighbors.Count > 0)
+                    if(final != null)
                     {
                         foreach (GameObject finalNeighbor in final.GetComponent<Visited>().neighbors)
                         {
-                            for (int j = 0; j < first.Count; j++)
-                            {
-                                if(second[j] != finalNeighbor)
-                                {
-                                    secondFinalee = second[j];
-                                    nieghborCount++;
-                                } 
-                            }
+                            if(second[iteration] != finalNeighbor) nieghborCount++;
                         }
-                        if(nieghborCount == final.GetComponent<Visited>().neighbors.Count && secondFinalee != null)
+                        if(nieghborCount == final.GetComponent<Visited>().neighbors.Count) secondFinal = second[iteration];
+                        else 
                         {
-                            secondFinal = secondFinalee;
-                            gotSecondFinal= true;
-                        } 
+                            direction.Add(second[iteration]);
+                            if(final != null && (direction[direction.Count-1].transform.position != upSide && direction[direction.Count-1].transform.position != rightSide)) Repeat(go, current, final, secondFinal);
+                            else
+                            {   
+                                done = true;
+                                return;
+                            } 
+                        }
                     }
-                }
-                if((direction[direction.Count-1].transform.position != upSide && direction[direction.Count-1].transform.position != rightSide) && gotSecondFinal == true && gotFinal == true) Repeat(go, current, final, secondFinal);
-                else
-                {
-                    done = true;
-                    return;
                 } 
+            }
         }
     }
 
