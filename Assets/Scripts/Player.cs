@@ -155,7 +155,7 @@ public class Player : MonoBehaviour
                         direction.Add(second[iteration]);
                     }
                 }
-                if((final != null && secondFinal != null) || (direction.Count == 2)) Repeat(go, current, final, secondFinal);
+                if((final != null && secondFinal != null) || (direction.Count == 2)) Repeat(go, current, final, secondFinal); //recursively add all blocks on path to direction array, in reversed order
 
                 break;
             } 
