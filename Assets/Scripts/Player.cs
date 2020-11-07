@@ -89,7 +89,7 @@ public class Player : MonoBehaviour
         bool gotFinal = false;
         bool gotSecondFinal = false;
 
-        if(secondFinal == null)
+        if(secondFinal == null) //in most cases this if statement is always used
         {
             for (int i = 0; i < first.Count; i++)
               {
@@ -121,7 +121,7 @@ public class Player : MonoBehaviour
                     } 
               }
         }
-        else if(secondFinal != null)
+        else if(secondFinal != null) //in case if the if statement from above is not true
         {
             for (int i = 0; i < first.Count; i++)
             {
