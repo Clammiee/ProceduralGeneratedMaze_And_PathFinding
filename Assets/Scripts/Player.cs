@@ -85,9 +85,6 @@ public class Player : MonoBehaviour
     private void Repeat(GameObject go, GameObject current, GameObject final, GameObject secondFinal)
     {
         int iteration = 0;
-        GameObject secondFinalee = null;
-        bool gotFinal = false;
-        bool gotSecondFinal = false;
 
         if(secondFinal == null)
         {
